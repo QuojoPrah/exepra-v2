@@ -8,6 +8,7 @@ const links = [
   { name: "Home & Living", href: "#" },
   { name: "Tech & Gadgets", href: "#" },
   { name: "Fitness", href: "#" },
+  { name: "Kids", href: "#" },
 ];
 
 export default function Navbar() {
@@ -51,7 +52,14 @@ export default function Navbar() {
         </Link>
 
         {/* Navigation */}
-        <div className="hidden items-center gap-8 lg:flex">
+        <div className={`
+          hidden
+          items-center
+          gap-8
+          lg:flex
+          transition-all
+          duration-300
+          ${scrolled ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
           {links.map((link) => (
             <Link
               key={link.name}
@@ -74,30 +82,60 @@ export default function Navbar() {
             </Link>
           ))}
 
-          <div className="relative ml-4 hidden xl:block">
+        </div>
+
+
+        {/* Search (Only when scrolled) */}
+        <div
+          className={`
+            absolute
+            left-1/2
+            -translate-x-1/2
+            transition-all
+            duration-500
+            ease-in-out
+            ${
+              scrolled
+                ? "opacity-100 translate-y-0"
+                : "pointer-events-none opacity-0 -translate-y-2"
+            }
+          `}
+          >
+          <div className="relative">
 
             <Search
               size={18}
-              strokeWidth={2.5}
-              className={`absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 ${
-                scrolled
-                  ? "text-slate-500"
-                  : "text-white"
-              }`}
+              strokeWidth={2}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
             />
 
             <input
               type="text"
               placeholder="Search products..."
-              className={`w-90 rounded-full border py-2.5 pl-11 pr-4 text-sm transition-all duration-300 focus:outline-none ${
-              scrolled
-              ? "border-slate-200 bg-white text-slate-700 placeholder:text-slate-400"
-              : "border-white/20 bg-white/10 text-white placeholder:text-white/60 backdrop-blur-xl"
-              }`}
+              className="
+                w-[620px]
+                rounded-full
+                border
+                border-slate-300
+                bg-white
+                py-2.5
+                pl-11
+                pr-4
+                text-md
+                text-slate-700
+                placeholder:text-slate-400
+                shadow-sm
+                transition-all
+                duration-300
+                focus:outline-none
+                focus:ring-2
+                focus:ring-yellow-700/20
+              "
             />
-          </div>
 
+          </div>
         </div>
+
 
         
 
