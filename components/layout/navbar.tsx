@@ -48,7 +48,7 @@ export default function Navbar() {
             ${scrolled ? "text-slate-900" : "text-white"}`}>
             exe
           </span>
-          <span className="text-yellow-700">pra</span>
+          <span className="text-yellow-600">pra</span>
         </Link>
 
         {/* Navigation */}
@@ -111,7 +111,7 @@ export default function Navbar() {
 
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search. Find. Save."
               className="
                 w-[620px]
                 rounded-full
@@ -142,25 +142,28 @@ export default function Navbar() {
         {/* Icons */}
         <div className="flex items-center gap-8">
 
-          <User
-          className={`h-5 w-5 cursor-pointer transition ${
-          scrolled
-          ? "text-slate-700 hover:text-blue-700"
-          : "text-white hover:text-white/70"
-          }`}
-          />
+          <Link href="/sign-in">
+            <User
+              className={`h-5 w-5 cursor-pointer transition ${
+                scrolled
+                  ? "text-slate-700 hover:text-yellow-700"
+                  : "text-white hover:text-yellow-500"
+              }`}
+            />
+          </Link>
+
           <Heart
           className={`h-5 w-5 cursor-pointer transition ${
           scrolled
-          ? "text-slate-700 hover:text-blue-700"
-          : "text-white hover:text-white/70"
+          ? "text-slate-700 hover:text-yellow-700"
+          : "text-white hover:text-yellow-500"
           }`}
           />
           <ShoppingBag
           className={`h-5 w-5 cursor-pointer transition ${
           scrolled
-          ? "text-slate-700 hover:text-blue-700"
-          : "text-white hover:text-white/70"
+          ? "text-slate-700 hover:text-yellow-700"
+          : "text-white hover:text-yellow-500"
           }`}
           />
         </div>

@@ -50,7 +50,7 @@ export default function SignInPage() {
 
         {/* Right Side */}
         <div className="flex w-full items-center justify-center lg:w-1/2">
-          <div className=" flex h-[780px] w-full max-w-[580px] flex-col rounded-[32px] bg-white p-12 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+          <div className=" flex h-[780px] w-full max-w-[580px] flex-col rounded-[32px] bg-white/95 border border-white/40 backdrop-blur-xl p-12 shadow-[0_35px_90px_rgba(0,0,0,0.18)]">
 
             <h2 className="mt-4 text-4xl font-semibold text-slate-900">
               Welcome back
@@ -84,9 +84,9 @@ export default function SignInPage() {
                     text-slate-900
                     outline-none
                     transition
-                    focus:border-slate-700
+                    focus:border-yellow-700
                     focus:ring-4
-                    focus:ring-amber-900/10
+                    focus:ring-yellow-700/20
                   "
                 />
               </div>
@@ -115,9 +115,9 @@ export default function SignInPage() {
                       text-slate-900
                       outline-none
                       transition
-                      focus:border-slate-700
+                      focus:border-yellow-700
                       focus:ring-4
-                      focus:ring-amber-900/10
+                      focus:ring-yellow-700/20
                     "
                   />
 
@@ -156,7 +156,7 @@ export default function SignInPage() {
 
                 <button
                   type="button"
-                  className="text-sm font-medium text-slate-900 transition hover:text-yellow-700"
+                  className="text-sm font-medium text-slate-900 transition-colors hover:text-yellow-700"
                 >
                   Forgot Password?
                 </button>
@@ -176,8 +176,9 @@ export default function SignInPage() {
                   transition-all
                   duration-300
                   hover:-translate-y-0.5
-                  hover:bg-black
-                  hover:shadow-xl
+                  hover:bg-yellow-800
+                  hover:scale-[1.02]
+                  hover:shadow-2xl
                   active:translate-y-0
                 "
               >
@@ -207,6 +208,12 @@ export default function SignInPage() {
                     border
                     border-slate-200
                     bg-white
+                    transition-all
+                    duration-300
+                    hover:-translate-y-1
+                    hover:scale-110
+                    hover:border-yellow-700
+                    hover:shadow-sm
                   "
                 >
                   <Image
@@ -229,6 +236,12 @@ export default function SignInPage() {
                     border
                     border-slate-200
                     bg-white
+                    transition-all
+                    duration-300
+                    hover:-translate-y-1
+                    hover:scale-110
+                    hover:border-yellow-700
+                    hover:shadow-sm
                   "
                 >
                   <Image
@@ -251,6 +264,12 @@ export default function SignInPage() {
                     border
                     border-slate-200
                     bg-white
+                    transition-all
+                    duration-300
+                    hover:-translate-y-1
+                    hover:scale-110
+                    hover:border-yellow-700
+                    hover:shadow-sm
                   "
                 >
                   <Image
@@ -267,7 +286,7 @@ export default function SignInPage() {
               Don't have an account?{" "}
               <Link
                 href="/sign-up"
-                className="font-semibold text-slate-900 hover:underline"
+                className="font-semibold text-slate-900 hover:text-yellow-700 transition-colors"
               >
                 Sign Up
               </Link>

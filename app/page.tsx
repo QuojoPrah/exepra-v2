@@ -4,6 +4,7 @@ import FeaturedIn from "@/components/home/featured-in";
 import Categories from "@/components/home/categories";
 import BestSellers from "@/components/home/best-sellers";
 import WhyExepra from "@/components/home/why-exepra";
+import SalePromotions from "@/components/home/sale-promotions";
 import FeaturedCollection from "@/components/home/featured-collection";
 import Testimonials from "@/components/home/testimonials";
 import Instagram from "@/components/home/instagram";
@@ -20,6 +21,7 @@ export default function Home() {
       <BestSellers />
       <FeaturedCollection />
       <WhyExepra />
+      <SalePromotions />
       <Testimonials />
       <Instagram />
       <Newsletter />

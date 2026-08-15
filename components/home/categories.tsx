@@ -83,7 +83,7 @@ export default function Categories() {
         <div className="relative mt-16">
           <button
             onClick={() => emblaApi?.scrollPrev()}
-            className="absolute left-5 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/76 shadow-sm transition-all duration-300 hover:scale-105"
+            className="absolute left-5 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/40 shadow-sm transition-all duration-300 hover:scale-105 hover:bg-white/80"
             >
             <ChevronLeft className="h-6 w-6 text-slate-800" />
           </button>
@@ -106,7 +106,7 @@ export default function Categories() {
 
           <button
             onClick={() => emblaApi?.scrollNext()}
-            className="absolute right-5 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/76 shadow-sm transition-all duration-300 hover:scale-105"
+            className="absolute right-5 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/40 shadow-sm transition-all duration-300 hover:scale-105 hover:bg-white/80"
             >
             <ChevronRight className="h-6 w-6 text-slate-800" />
           </button>
