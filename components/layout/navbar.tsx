@@ -63,7 +63,7 @@ export default function Navbar() {
   }, []);
 
   /* ---------------------------------------------
-     Close mobile menu when resizing to desktop
+     Close mobile UI when resizing to desktop
   --------------------------------------------- */
 
   useEffect(() => {
@@ -104,8 +104,7 @@ export default function Navbar() {
   useEffect(() => {
     const updateCartCount = () => {
       try {
-        const savedCart =
-          localStorage.getItem(CART_STORAGE_KEY);
+        const savedCart = localStorage.getItem(CART_STORAGE_KEY);
 
         if (!savedCart) {
           setCartCount(0);
@@ -127,26 +126,12 @@ export default function Navbar() {
 
     updateCartCount();
 
-    window.addEventListener(
-      "storage",
-      updateCartCount
-    );
-
-    window.addEventListener(
-      "cart-updated",
-      updateCartCount
-    );
+    window.addEventListener("storage", updateCartCount);
+    window.addEventListener("cart-updated", updateCartCount);
 
     return () => {
-      window.removeEventListener(
-        "storage",
-        updateCartCount
-      );
-
-      window.removeEventListener(
-        "cart-updated",
-        updateCartCount
-      );
+      window.removeEventListener("storage", updateCartCount);
+      window.removeEventListener("cart-updated", updateCartCount);
     };
   }, []);
 
@@ -158,17 +143,14 @@ export default function Navbar() {
     const updateWishlistCount = () => {
       try {
         const savedWishlist =
-          localStorage.getItem(
-            WISHLIST_STORAGE_KEY
-          );
+          localStorage.getItem(WISHLIST_STORAGE_KEY);
 
         if (!savedWishlist) {
           setWishlistCount(0);
           return;
         }
 
-        const wishlist: string[] =
-          JSON.parse(savedWishlist);
+        const wishlist: string[] = JSON.parse(savedWishlist);
 
         setWishlistCount(wishlist.length);
       } catch {
@@ -178,32 +160,14 @@ export default function Navbar() {
 
     updateWishlistCount();
 
-    window.addEventListener(
-      "storage",
-      updateWishlistCount
-    );
-
-    window.addEventListener(
-      "wishlist-updated",
-      updateWishlistCount
-    );
+    window.addEventListener("storage", updateWishlistCount);
+    window.addEventListener("wishlist-updated", updateWishlistCount);
 
     return () => {
-      window.removeEventListener(
-        "storage",
-        updateWishlistCount
-      );
-
-      window.removeEventListener(
-        "wishlist-updated",
-        updateWishlistCount
-      );
+      window.removeEventListener("storage", updateWishlistCount);
+      window.removeEventListener("wishlist-updated", updateWishlistCount);
     };
   }, []);
-
-  /* ---------------------------------------------
-     Close mobile menu
-  --------------------------------------------- */
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
@@ -213,7 +177,7 @@ export default function Navbar() {
     <header className="fixed inset-x-0 top-0 z-50">
       <nav
         className={`
-          flex items-center justify-between
+          relative flex items-center
           transition-all duration-300 ease-out
 
           h-[72px]
@@ -238,15 +202,9 @@ export default function Navbar() {
 
         <button
           type="button"
-          aria-label={
-            mobileMenuOpen
-              ? "Close menu"
-              : "Open menu"
-          }
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileMenuOpen}
-          onClick={() =>
-            setMobileMenuOpen(!mobileMenuOpen)
-          }
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className={`
             flex h-10 w-10 items-center justify-center
             rounded-full transition-colors
@@ -269,30 +227,118 @@ export default function Navbar() {
             LOGO
         ========================================= */}
 
+        <div
+         className={`
+          absolute
+          left-1/2
+          top-1/2
+          -translate-x-1/2
+          -translate-y-1/2
+          lg:hidden
+          transition-all duration-500 ease-[cubic-bezier(0.22, 1, 0.36, 1)]
+
+          ${ 
+           scrolled
+          ? "pointer-events-none  scale-95 opacity-0"
+          : "scale-100 opacity-100 lg:static lg:translate-y-0"
+          }
+          `}
+        >
+
         <ExepraLogo
           light={!scrolled}
           className="
-            absolute left-1/2
-            -translate-x-1/2
             text-[24px]
-
             sm:text-[27px]
-
-            lg:static
-            lg:translate-x-0
             lg:text-[30px]
           "
         />
+        </div>
+
+        {/* Desktop Logo */}
+
+        <div className="hidden lg:flex">
+          <ExepraLogo
+            light={!scrolled}
+            className="text-[30px]"
+          />
+        </div>
+
+
+        {/* =========================================
+        MOBILE SEARCH — SCROLLED STATE
+        ========================================= */}
+        <div
+          className={`
+            absolute
+            left-1/2
+            top-1/2
+            -translate-x-1/2
+            -translate-y-1/2
+            lg:hidden
+            transition-all
+            duration-500
+            ease-[cubic-bezier(0.22,1,0.36,1)]
+
+            ${
+              scrolled
+              ? "pointer-events-auto scale-100 opacity-100"
+              : "pointer-events-none scale-95 opacity-0"
+            }
+          `}
+        >
+          <div className="relative">
+            <Search
+              className="
+                absolute
+                left-3.5
+                top-1/2
+                h-4
+                w-4
+                -translate-y-1/2
+                text-slate-400
+              "
+            />
+
+            <input
+              type="search"
+              placeholder="Search. Find. Save."
+              aria-label="Search products"
+              className="
+                h-9
+                w-[min(52vw,320px)]
+                rounded-full
+                border
+                border-slate-200
+                bg-slate-50
+                pl-9
+                pr-3
+                text-xs
+                text-slate-700
+                placeholder:text-slate-400
+                shadow-s
+                focus:border-yellow-700
+                focus:bg-white
+                focus:outline-none
+                focus:ring-2
+                focus:ring-yellow-700/20
+              "
+            />
+          </div>
+        </div>
 
         {/* =========================================
             DESKTOP NAVIGATION
+            CENTERED INDEPENDENTLY FROM LOGO
         ========================================= */}
 
         <div
           className={`
-            hidden items-center gap-8
+            absolute left-1/2
+            hidden -translate-x-1/2
+            items-center gap-8
             lg:flex
-            transition-opacity duration-300
+            transition-all duration-300
 
             ${
               scrolled
@@ -306,10 +352,9 @@ export default function Navbar() {
               key={link.name}
               href={link.href}
               className={`
-                group relative py-2
-                text-sm font-medium
+                group relative whitespace-nowrap
+                py-2 text-sm font-medium
                 transition-colors duration-300
-
                 ${
                   scrolled
                     ? "text-slate-700 hover:text-yellow-700"
@@ -328,7 +373,6 @@ export default function Navbar() {
                   transition-transform duration-500
                   ease-out
                   group-hover:scale-x-100
-
                   ${
                     scrolled
                       ? "bg-yellow-700"
@@ -399,31 +443,32 @@ export default function Navbar() {
             RIGHT SIDE ICONS
         ========================================= */}
 
-        <div className="ml-auto flex items-center gap-2 sm:gap-4 lg:gap-8">
-
+        <div className="ml-auto flex items-center sm:gap-1 lg:gap-8">
           {/* Mobile Search */}
 
-          <button
-            type="button"
-            aria-label="Search"
-            onClick={() =>
-              setMobileSearchOpen(!mobileSearchOpen)
-            }
-            className={`
-              flex h-10 w-10 items-center justify-center
-              rounded-full
-              transition-colors
-              lg:hidden
-
-              ${
-                scrolled
-                  ? "text-slate-700 hover:bg-slate-100"
-                  : "text-white hover:bg-white/10"
+          {!scrolled && (
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() =>
+                setMobileSearchOpen(!mobileSearchOpen)
               }
-            `}
-          >
-            <Search className="h-5 w-5" />
-          </button>
+              className={`
+                flex h-10 w-10
+                items-center justify-center
+                rounded-full
+                transition-colors
+                lg:hidden
+                ${
+                  scrolled
+                    ? "text-slate-700 hover:bg-slate-100"
+                    : "text-white hover:bg-white/10"
+                }
+              `}
+            >
+              <Search className="h-5 w-5" />
+            </button>
+          )}
 
           {/* User */}
 
@@ -436,7 +481,6 @@ export default function Navbar() {
               className={`
                 h-5 w-5
                 transition-colors
-
                 ${
                   scrolled
                     ? "text-slate-700 hover:text-yellow-700"
@@ -461,7 +505,6 @@ export default function Navbar() {
               className={`
                 h-5 w-5
                 transition-colors
-
                 ${
                   scrolled
                     ? "text-slate-700 hover:text-yellow-700"
@@ -473,27 +516,18 @@ export default function Navbar() {
             {wishlistCount > 0 && (
               <span
                 className="
-                  absolute
-                  right-0
-                  top-0
-                  flex
-                  h-[17px]
-                  min-w-[17px]
-                  items-center
-                  justify-center
+                  absolute right-0 top-0
+                  flex h-[17px] min-w-[17px]
+                  items-center justify-center
                   rounded-full
                   bg-yellow-600
                   px-1
                   text-[9px]
-                  font-bold
-                  leading-none
-                  text-white
-                  shadow-sm
+                  font-bold leading-none
+                  text-white shadow-sm
                 "
               >
-                {wishlistCount > 99
-                  ? "99+"
-                  : wishlistCount}
+                {wishlistCount > 99 ? "99+" : wishlistCount}
               </span>
             )}
           </Link>
@@ -513,7 +547,6 @@ export default function Navbar() {
               className={`
                 h-5 w-5
                 transition-colors
-
                 ${
                   scrolled
                     ? "text-slate-700 hover:text-yellow-700"
@@ -525,27 +558,18 @@ export default function Navbar() {
             {cartCount > 0 && (
               <span
                 className="
-                  absolute
-                  right-0
-                  top-0
-                  flex
-                  h-[17px]
-                  min-w-[17px]
-                  items-center
-                  justify-center
+                  absolute right-0 top-0
+                  flex h-[17px] min-w-[17px]
+                  items-center justify-center
                   rounded-full
                   bg-yellow-600
                   px-1
                   text-[9px]
-                  font-bold
-                  leading-none
-                  text-white
-                  shadow-sm
+                  font-bold leading-none
+                  text-white shadow-sm
                 "
               >
-                {cartCount > 99
-                  ? "99+"
-                  : cartCount}
+                {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}
           </Link>
@@ -609,113 +633,169 @@ export default function Navbar() {
       </div>
 
       {/* =========================================
-          MOBILE MENU
+      MOBILE MENU
       ========================================= */}
 
       <div
         className={`
-          fixed inset-0 top-[72px]
-          z-40
+          fixed
+          inset-0
+          z-[60]
           lg:hidden
+          transition-opacity
+          duration-300
           ${
             mobileMenuOpen
-              ? "pointer-events-auto"
-              : "pointer-events-none"
+              ? "pointer-events-auto opacity-100"
+              : "pointer-events-none opacity-0"
           }
         `}
       >
-        {/* Backdrop */}
+        {/* Blurred website backdrop */}
 
         <button
           type="button"
           aria-label="Close menu"
           onClick={closeMobileMenu}
-          className={`
-            absolute inset-0
-            bg-slate-950/30
-            backdrop-blur-[2px]
-            transition-opacity duration-300
-
-            ${
-              mobileMenuOpen
-                ? "opacity-100"
-                : "opacity-0"
-            }
-          `}
+          className="
+            absolute
+            inset-0
+            bg-slate-950/20
+            backdrop-blur-sm
+          "
         />
 
-        {/* Menu panel */}
+        {/* ONLY X stays visible */}
+
+        <button
+
+          type="button"
+
+          aria-label="Close menu"
+
+          onClick={closeMobileMenu}
+
+          className="
+
+            absolute
+
+            left-4 top-4
+
+            z-[70]
+
+            flex h-10 w-10
+
+            items-center justify-center
+
+            rounded-full
+
+            text-white
+
+            transition
+
+            hover:bg-white/10
+
+            sm:left-6
+
+          "
+
+        >
+
+          <X className="h-5 w-5" />
+
+        </button>
+
+        {/* Dropdown menu */}
 
         <div
           className={`
-            relative
-            border-b
-            border-slate-200
-            bg-white
-            px-5
-            py-6
-            shadow-xl
-            transition-transform duration-300 ease-out
+            absolute
+            left-4
+            top-[72px]
+            sm:left-6
+            sm:top-20
+            z-70
+            w-[255px]
+            transition-all
+            duration-300
+            ease-out
 
             ${
               mobileMenuOpen
-                ? "translate-y-0"
-                : "-translate-y-4"
+                ? "translate-y-0 scale-100 opacity-100"
+                : "-translate-y-2 scale-[0.98] opacity-0"
             }
           `}
         >
-          <div className="space-y-1">
-            {links.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={closeMobileMenu}
-                className="
-                  flex items-center
-                  justify-between
-                  border-b
-                  border-slate-100
-                  py-4
-                  text-base
-                  font-medium
-                  text-slate-800
-                  transition-colors
-                  hover:text-yellow-700
-                "
-              >
-                {link.name}
-
-                <span className="text-lg text-slate-400">
-                  ›
-                </span>
-              </Link>
-            ))}
-          </div>
-
-          {/* Mobile account */}
-
-          <Link
-            href="/sign-in"
-            onClick={closeMobileMenu}
+          <div
             className="
-              mt-5
-              flex items-center
-              gap-3
-              rounded-xl
-              bg-slate-50
-              px-4
-              py-3.5
-              text-sm
-              font-medium
-              text-slate-800
-              transition-colors
-              hover:bg-slate-100
+              overflow-hidden
+              rounded-2xl
+              border border-slate-200
+              bg-white
+              p-2
+              shadow-[0_20px_50px_rgba(15,23,42,0.18)]
             "
           >
-            <User className="h-5 w-5 text-slate-600" />
+            {/* Navigation links */}
 
-            Sign in to Exepra
-          </Link>
+            <div>
+              {links.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={closeMobileMenu}
+                  className="
+                    flex items-center
+                    justify-between
+                    rounded-xl
+                    px-3.5
+                    py-2.5
+                    text-sm
+                    font-medium
+                    text-slate-800
+                    transition-colors
+                    hover:bg-slate-50
+                    hover:text-yellow-700
+                  "
+                >
+                  {link.name}
+
+                  <span className="text-base text-slate-400">
+                    ›
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Divider */}
+
+            <div className="my-2 h-px bg-slate-100" />
+
+            {/* Account */}
+
+            <Link
+              href="/sign-in"
+              onClick={closeMobileMenu}
+              className="
+                flex items-center
+                gap-3
+                rounded-xl
+                px-3.5
+                py-2.5
+                text-sm
+                font-medium
+                text-slate-700
+                transition-colors
+                hover:bg-slate-50
+                hover:text-yellow-700
+              "
+            >
+              <User className="h-[18px] w-[18px] text-slate-500" />
+
+              Sign in to Exepra
+            </Link>
+          </div>
         </div>
       </div>
     </header>
