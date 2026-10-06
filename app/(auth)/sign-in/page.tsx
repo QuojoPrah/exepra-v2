@@ -2,151 +2,189 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Apple, Globe, Eye, EyeOff } from "lucide-react";
-
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-
-
 
 export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <main className="min-h-screen bg-[#FAFAF8]">
-      <div className="mx-auto flex min-h-screen max-w-7xl items-center px-6 py-6">
-        
-        {/* Left Side */}
-        <div className="relative hidden h-[780px] w-1/2 overflow-hidden rounded-[32px] lg:block">
+      <div className="mx-auto flex min-h-screen max-w-7xl items-center px-5 py-6 sm:px-8">
+        <div className="grid w-full overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.12)] lg:grid-cols-2">
 
-          <Image
-            src="/images/auth/sign-in.jpg"
-            alt="Exepra Lifestyle"
-            fill
-            priority
-            className="object-cover"
-          />
+          {/* =========================================================
+              LEFT — BRAND / LIFESTYLE
+          ========================================================== */}
+          <div className="relative hidden min-h-[680px] lg:block">
+            <Image
+              src="/images/auth/sign-in.jpg"
+              alt="Exepra Lifestyle"
+              fill
+              priority
+              sizes="50vw"
+              className="object-cover"
+            />
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
+            {/* Image overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
 
-          <div className="absolute bottom-12 left-12 right-12 text-white">
+            {/* Brand content */}
+            <div className="absolute inset-x-10 bottom-10 text-white xl:inset-x-12">
+              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-white/75">
+                Shop with Exepra
+              </p>
 
-            <span className="text-sm font-medium uppercase tracking-[0.35em] text-white/80">
-              Shop with Exepra
-            </span>
+              <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight xl:text-5xl">
+                Elevate
+                <br />
+                Everyday Living.
+              </h1>
 
-            <h1 className="mt-5 text-5xl font-semibold leading-tight">
-              Elevate
-              <br />
-              Everyday Living.
-            </h1>
-
-            <p className="mt-6 max-w-md text-lg leading-8 text-white/80">
-              Discover carefully curated products designed to elevate your everyday living.
-            </p>
-
+              <p className="mt-5 max-w-md text-sm leading-7 text-white/75 xl:text-base">
+                Discover carefully curated products designed to elevate your
+                everyday living.
+              </p>
+            </div>
           </div>
 
-        </div>
+          {/* =========================================================
+              RIGHT — SIGN IN
+          ========================================================== */}
+          <div className="flex min-h-[680px] items-center justify-center bg-white">
+            <div className="w-full max-w-[480px] px-7 py-8 sm:px-10">
 
-        {/* Right Side */}
-        <div className="flex w-full items-center justify-center lg:w-1/2">
-          <div className=" flex h-[780px] w-full max-w-[580px] flex-col rounded-[32px] bg-white/95 border border-white/40 backdrop-blur-xl p-12 shadow-[0_35px_90px_rgba(0,0,0,0.18)]">
+              {/* Logo */}
+              <div className="text-center">
+                <Link
+                  href="/"
+                  className="inline-block text-lg font-bold tracking-[0.28em] text-slate-950 transition hover:opacity-70"
+                >
+                  EXEPRA
+                </Link>
 
-            <h2 className="mt-4 text-4xl font-semibold text-slate-900">
-              Welcome back
-            </h2>
+                <h2 className="mt-6 text-3xl font-semibold tracking-tight text-slate-950 sm:text-[34px]">
+                  Welcome back
+                </h2>
 
-            <p className="mt-4 text-slate-500">
-              Sign in to continue your shopping experience.
-            </p>
-
-            <form className="mt-10 space-y-6">
-
-              {/* Email */}
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Email Address
-                </label>
-
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  autoComplete="email"
-                  required
-                  className="
-                    w-full
-                    rounded-2xl
-                    border
-                    border-slate-200
-                    bg-white
-                    px-5
-                    py-4
-                    text-slate-900
-                    outline-none
-                    transition
-                    focus:border-yellow-700
-                    focus:ring-4
-                    focus:ring-yellow-700/20
-                  "
-                />
+                <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500">
+                  Sign in to continue your shopping experience.
+                </p>
               </div>
 
-              {/* Password */}
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">
-                  Password
-                </label>
+              {/* Form */}
+              <form className="mt-8 space-y-5">
 
-                <div className="relative">
+                {/* Email */}
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="mb-2 block text-sm font-medium text-slate-700"
+                  >
+                    Email Address
+                  </label>
+
                   <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    autoComplete="email"
                     required
                     className="
                       w-full
-                      rounded-2xl
+                      rounded-xl
                       border
                       border-slate-200
                       bg-white
-                      px-5
-                      py-4
-                      pr-14
+                      px-4
+                      py-3.5
+                      text-sm
                       text-slate-900
+                      placeholder:text-slate-400
                       outline-none
                       transition
                       focus:border-yellow-700
                       focus:ring-4
-                      focus:ring-yellow-700/20
+                      focus:ring-yellow-700/10
                     "
                   />
-
-                  <button
-
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="
-                      absolute
-                      right-6
-                      top-1/2
-                      -translate-y-1/2
-                      text-slate-400
-                      transition
-                      hover:text-slate-700
-                    "
-                    >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-
                 </div>
-              </div>
 
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-3 text-sm text-slate-600">
+                {/* Password */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label
+                      htmlFor="password"
+                      className="text-sm font-medium text-slate-700"
+                    >
+                      Password
+                    </label>
+
+                    <button
+                      type="button"
+                      className="text-xs font-medium text-slate-500 transition hover:text-yellow-700"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      autoComplete="current-password"
+                      required
+                      className="
+                        w-full
+                        rounded-xl
+                        border
+                        border-slate-200
+                        bg-white
+                        px-4
+                        py-3.5
+                        pr-12
+                        text-sm
+                        text-slate-900
+                        placeholder:text-slate-400
+                        outline-none
+                        transition
+                        focus:border-yellow-700
+                        focus:ring-4
+                        focus:ring-yellow-700/10
+                      "
+                    />
+
+                    <button
+                      type="button"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="
+                        absolute
+                        right-4
+                        top-1/2
+                        flex
+                        -translate-y-1/2
+                        items-center
+                        justify-center
+                        text-slate-400
+                        transition
+                        hover:text-slate-700
+                      "
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-[18px] w-[18px]" />
+                      ) : (
+                        <Eye className="h-[18px] w-[18px]" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Remember me */}
+                <label className="flex cursor-pointer items-center gap-2.5 text-sm text-slate-600">
                   <input
                     type="checkbox"
                     className="h-4 w-4 rounded border-slate-300 accent-slate-900"
@@ -154,144 +192,152 @@ export default function SignInPage() {
                   Remember me
                 </label>
 
+                {/* Sign In */}
                 <button
-                  type="button"
-                  className="text-sm font-medium text-slate-900 transition-colors hover:text-yellow-700"
-                >
-                  Forgot Password?
-                </button>
-              </div>
-
-              <button
-                type="submit"
-                className="
-                  w-full
-                  rounded-2xl
-                  bg-yellow-700
-                  py-4
-                  text-white
-                  font-medium
-                  shadow-lg
-                  shadow-slate-900/10
-                  transition-all
-                  duration-300
-                  hover:-translate-y-0.5
-                  hover:bg-yellow-800
-                  hover:scale-[1.02]
-                  hover:shadow-2xl
-                  active:translate-y-0
-                "
-              >
-                Sign In
-              </button>
-
-              <div className="my-10 flex items-center">
-                <div className="h-px flex-1 bg-slate-200" />
-
-                <span className="px-5 text-sm text-slate-400">
-                  or continue with
-                </span>
-
-                <div className="h-px flex-1 bg-slate-200" />
-              </div>
-
-              <div className="flex items-center justify-center gap-5">
-                <button
-                  type="button"
+                  type="submit"
                   className="
+                    group
                     flex
-                    h-12
-                    w-12
+                    w-full
                     items-center
                     justify-center
-                    rounded-full
-                    border
-                    border-slate-200
-                    bg-white
+                    rounded-xl
+                    bg-yellow-700
+                    py-3.5
+                    text-sm
+                    font-semibold
+                    text-white
+                    shadow-lg
+                    shadow-yellow-900/10
                     transition-all
                     duration-300
-                    hover:-translate-y-1
-                    hover:scale-110
-                    hover:border-yellow-700
-                    hover:shadow-sm
+                    hover:-translate-y-0.5
+                    hover:bg-slate-950
+                    hover:shadow-xl
+                    active:translate-y-0
                   "
                 >
-                  <Image
-                    src="/icons/google.svg"
-                    alt="Google"
-                    width={22}
-                    height={22}
-                  />
+                  Sign In
                 </button>
 
-                <button
-                  type="button"
-                  className="
-                    flex
-                    h-12
-                    w-12
-                    items-center
-                    justify-center
-                    rounded-full
-                    border
-                    border-slate-200
-                    bg-white
-                    transition-all
-                    duration-300
-                    hover:-translate-y-1
-                    hover:scale-110
-                    hover:border-yellow-700
-                    hover:shadow-sm
-                  "
+                {/* Divider */}
+                <div className="flex items-center gap-4 py-2">
+                  <div className="h-px flex-1 bg-slate-200" />
+
+                  <span className="text-xs font-medium text-slate-400">
+                    OR CONTINUE WITH
+                  </span>
+
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+
+                {/* Social login */}
+                <div className="flex items-center justify-center gap-4">
+                  {/* Google */}
+                  <button
+                    type="button"
+                    aria-label="Continue with Google"
+                    className="
+                      flex
+                      h-11
+                      w-11
+                      items-center
+                      justify-center
+                      rounded-full
+                      border
+                      border-slate-200
+                      bg-white
+                      transition-all
+                      duration-300
+                      hover:-translate-y-0.5
+                      hover:border-slate-300
+                      hover:shadow-md
+                    "
+                  >
+                    <Image
+                      src="/icons/google.svg"
+                      alt="Google"
+                      width={20}
+                      height={20}
+                    />
+                  </button>
+
+                  {/* Apple */}
+                  <button
+                    type="button"
+                    aria-label="Continue with Apple"
+                    className="
+                      flex
+                      h-11
+                      w-11
+                      items-center
+                      justify-center
+                      rounded-full
+                      border
+                      border-slate-200
+                      bg-white
+                      transition-all
+                      duration-300
+                      hover:-translate-y-0.5
+                      hover:border-slate-300
+                      hover:shadow-md
+                    "
+                  >
+                    <Image
+                      src="/icons/apple.svg"
+                      alt="Apple"
+                      width={20}
+                      height={20}
+                    />
+                  </button>
+
+                  {/* Facebook */}
+                  <button
+                    type="button"
+                    aria-label="Continue with Facebook"
+                    className="
+                      flex
+                      h-11
+                      w-11
+                      items-center
+                      justify-center
+                      rounded-full
+                      border
+                      border-slate-200
+                      bg-white
+                      transition-all
+                      duration-300
+                      hover:-translate-y-0.5
+                      hover:border-slate-300
+                      hover:shadow-md
+                    "
+                  >
+                    <Image
+                      src="/icons/facebook.svg"
+                      alt="Facebook"
+                      width={20}
+                      height={20}
+                    />
+                  </button>
+                </div>
+              </form>
+
+              {/* Sign Up */}
+              <p className="mt-6 text-center text-xs text-slate-500">
+                Don't have an account?{" "}
+                <Link
+                  href="/sign-up"
+                  className="font-semibold text-slate-950 transition hover:text-yellow-700"
                 >
-                  <Image
-                    src="/icons/apple.svg"
-                    alt="Apple"
-                    width={22}
-                    height={22}
-                  />
-                </button>
+                  Create one
+                </Link>
+              </p>
 
-                <button
-                  type="button"
-                  className="
-                    flex
-                    h-12
-                    w-12
-                    items-center
-                    justify-center
-                    rounded-full
-                    border
-                    border-slate-200
-                    bg-white
-                    transition-all
-                    duration-300
-                    hover:-translate-y-1
-                    hover:scale-110
-                    hover:border-yellow-700
-                    hover:shadow-sm
-                  "
-                >
-                  <Image
-                    src="/icons/facebook.svg"
-                    alt="Facebook"
-                    width={22}
-                    height={22}
-                  />
-                </button>
-              </div>
-            </form>
-
-            <p className="mt-8 text-center text-sm text-slate-500">
-              Don't have an account?{" "}
-              <Link
-                href="/sign-up"
-                className="font-semibold text-slate-900 hover:text-yellow-700 transition-colors"
-              >
-                Sign Up
-              </Link>
-            </p>
-
+              {/* Small trust message */}
+              <p className="mt-5 text-center text-[11px] text-slate-400">
+                Secure access to your Exepra account.
+              </p>
+            </div>
           </div>
         </div>
       </div>

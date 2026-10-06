@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 function formatCountdown(totalSeconds: number) {
@@ -28,12 +27,11 @@ const promotions = [
     discount: "UP TO 40% OFF",
     image: "/images/sale/summer-sale.jpg",
 
-    // Sale ends: August 18, 2026 at 23:59
+    // DEMO DATE — replace with the real campaign date later.
     endsAt: "2026-08-18T23:59:59+02:00",
 
     href: "/sale",
   },
-
   {
     eyebrow: "HOME & LIVING",
     title: "Refresh Your Space",
@@ -42,7 +40,7 @@ const promotions = [
     discount: "UP TO 30% OFF",
     image: "/images/sale/home-sale.jpg",
 
-    // Sale ends: August 21, 2026 at 23:59
+    // DEMO DATE — replace with the real campaign date later.
     endsAt: "2026-08-21T23:59:59+02:00",
 
     href: "/collections/home-living",
@@ -50,58 +48,58 @@ const promotions = [
 ];
 
 export default function SalePromotions() {
-  const [timeLeft, setTimeLeft] = useState(
-  promotions.map((promotion) =>
-    Math.max(
-      0,
-      Math.floor(
-        (new Date(promotion.endsAt).getTime() - Date.now()) / 1000
-      )
-    )
-  )
-);
-
-  useEffect(() => {
-  const timer = setInterval(() => {
-    setTimeLeft(
-      promotions.map((promotion) =>
-        Math.max(
-          0,
-          Math.floor(
-            (new Date(promotion.endsAt).getTime() - Date.now()) / 1000
-          )
+  const [timeLeft, setTimeLeft] = useState<number[]>(
+    promotions.map((promotion) =>
+      Math.max(
+        0,
+        Math.floor(
+          (new Date(promotion.endsAt).getTime() - Date.now()) / 1000
         )
       )
-    );
-  }, 1000);
+    )
+  );
 
-  return () => clearInterval(timer);
-}, []);
+  useEffect(() => {
+    const updateCountdown = () => {
+      setTimeLeft(
+        promotions.map((promotion) =>
+          Math.max(
+            0,
+            Math.floor(
+              (new Date(promotion.endsAt).getTime() - Date.now()) / 1000
+            )
+          )
+        )
+      );
+    };
+
+    updateCountdown();
+
+    const timer = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <section className="bg-[#FAFAF8] py-28 md:py-32">
+    <section className="bg-[#FAFAF8] py-24 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
-
         {/* Section Heading */}
-        <div className="mb-12 text-center">
-
-          <p className="mx-auto mb-3 text-md  font-semibold uppercase tracking-[0.4em] text-slate-400">
-            Offers
+        <div className="mx-auto mb-14 max-w-3xl text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.45em] text-slate-400">
+            OFFERS
           </p>
 
-          <h2 className="text-5xl font-bold tracking-tight text-slate-900">
+          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
             Exceptional pieces.
           </h2>
 
-          <p className="mx-auto mt-3 max-w-xl text-lg leading-6 text-slate-500">
-             Available for a limited time.
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-500 md:text-lg">
+            Available for a limited time.
           </p>
-
         </div>
 
         {/* Promotion Cards */}
         <div className="grid gap-7 lg:grid-cols-2">
-
           {promotions.map((promotion, index) => {
             const countdown = formatCountdown(timeLeft[index]);
             const saleEnded = timeLeft[index] === 0;
@@ -109,38 +107,24 @@ export default function SalePromotions() {
             return (
               <article
                 key={promotion.title}
-                className="
-                  group
-                  relative
-                  min-h-[600px]
-                  overflow-hidden
-                  rounded-[32px]
-                  bg-slate-900
-                "
+                className="group relative min-h-[600px] overflow-hidden rounded-[32px] bg-slate-900"
               >
-
                 {/* Image */}
                 <Image
                   src={promotion.image}
                   alt={promotion.title}
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="
-                    object-cover
-                    transition-transform
-                    duration-[1200ms]
-                    ease-out
-                    group-hover:scale-[1.04]
-                  "
+                  className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
                 />
 
-                {/* Premium Overlay */}
+                {/* Cinematic Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
 
-                {/* Subtle top gradient */}
+                {/* Subtle Top Gradient */}
                 <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/20 to-transparent" />
 
-                {/* Limited Offer Badge */}
+                {/* Eyebrow */}
                 <div className="absolute left-7 top-7 md:left-9 md:top-9">
                   <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white backdrop-blur-md">
                     {promotion.eyebrow}
@@ -149,24 +133,24 @@ export default function SalePromotions() {
 
                 {/* Content */}
                 <div className="relative flex h-full flex-col justify-end p-7 md:p-10">
-
                   <div className="max-w-xl">
-
-                    <p className="text-s font-bold uppercase tracking-[0.25em] text-yellow-400">
+                    {/* Discount */}
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-yellow-400">
                       {promotion.discount}
                     </p>
 
-                    <h3 className="mt-3 text-4xl font-semibold tracking-tight text-white md:text-5xl">
+                    {/* Title */}
+                    <h3 className="mt-3 text-4xl font-semibold leading-tight tracking-tight text-white md:text-5xl">
                       {promotion.title}
                     </h3>
 
+                    {/* Description */}
                     <p className="mt-4 max-w-md text-sm leading-6 text-white/70 md:text-base">
                       {promotion.description}
                     </p>
 
                     {/* Countdown */}
                     <div className="mt-7">
-
                       {saleEnded ? (
                         <div>
                           <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/50">
@@ -184,7 +168,6 @@ export default function SalePromotions() {
                           </p>
 
                           <div className="mt-3 flex items-center gap-2">
-
                             <CountdownUnit
                               value={countdown.days}
                               label="Days"
@@ -210,88 +193,60 @@ export default function SalePromotions() {
                               value={countdown.seconds}
                               label="Sec"
                             />
-
                           </div>
                         </>
                       )}
-
-                    </div>              
+                    </div>
 
                     {/* CTA */}
                     {saleEnded ? (
-                      <div
-                        className="
-                          mt-8
-                          inline-flex
-                          w-fit
-                          items-center
-                          rounded-full
-                          border
-                          border-white/20
-                          bg-white/10
-                          px-6
-                          py-3.5
-                          text-sm
-                          font-medium
-                          text-white/60
-                          backdrop-blur-sm
-                        "
-                      >
+                      <div className="mt-8 inline-flex w-fit items-center rounded-full border border-white/20 bg-white/10 px-6 py-3.5 text-sm font-medium text-white/60 backdrop-blur-sm">
                         Offer ended
                       </div>
                     ) : (
                       <Link
                         href={promotion.href}
-                        className="
-                          mt-8
-                          inline-flex
-                          items-center
-                          gap-2
-                          rounded-full
-                          bg-white
-                          px-6
-                          py-3.5
-                          text-sm
-                          font-medium
-                          text-slate-900
-                          transition-all
-                          duration-300
-                          hover:-translate-y-0.5
-                          hover:bg-yellow-700
-                          hover:text-white
-                        "
+                        className="group/cta mt-8 inline-flex h-12 min-w-[150px] items-center justify-center gap-3 rounded-full bg-white px-6 text-sm font-semibold text-slate-900 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
                       >
-                        Shop the offer
+                        <span>Shop the offer</span>
 
-                        <ArrowRight
-                          className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
-                          strokeWidth={2}
-                        />
+                        <span
+                          aria-hidden="true"
+                          className="flex items-center transition-transform duration-300 group-hover/cta:translate-x-1"
+                        >
+                          <svg
+                            width="7"
+                            height="12"
+                            viewBox="0 0 7 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M1 1L6 6L1 11"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </span>
                       </Link>
                     )}
                   </div>
                 </div>
-
               </article>
             );
           })}
-
         </div>
 
         {/* Bottom Trust Line */}
         <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-
-          <p>
-            Limited-time offers · While selected items last
-          </p>
-
+          <p>Limited-time offers · While selected items last</p>
         </div>
-
       </div>
     </section>
   );
 }
-
 
 /* -------------------------------- */
 /* Countdown Components */
@@ -317,11 +272,6 @@ function CountdownUnit({
   );
 }
 
-
 function CountdownSeparator() {
-  return (
-    <span className="text-sm text-white/30">
-      :
-    </span>
-  );
+  return <span className="text-sm text-white/30">:</span>;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 const testimonials = [
   {
@@ -60,132 +60,118 @@ const testimonials = [
   },
 ];
 
-
 export default function Testimonials() {
   const [activePage, setActivePage] = useState(0);
 
-  const totalPages = 3;
-
-  const startIndex =
-    activePage === 0
-      ? 0
-      : activePage === 1
-      ? 1
-      : 3;
+  const totalPages = Math.ceil(testimonials.length / 3);
+  const startIndex = activePage * 3;
 
   const visibleTestimonials = testimonials.slice(
     startIndex,
     startIndex + 3
   );
 
+  const indicatorPosition =
+    totalPages > 1 ? (activePage / (totalPages - 1)) * 100 : 0;
+
   return (
-    <section className="bg-white py-18">
-      <div className="mx-auto max-w-7xl px-8">
-
+    <section className="bg-white py-24 md:py-28">
+      <div className="mx-auto max-w-7xl px-6">
         {/* Heading */}
-        <div className="mb-12 text-center">
-
-          <p className="mx-auto max-w-2xl mt-4 mb-4 font-bold text-2xl leading-8 uppercase text-slate-900">
-            Feedback from our <span className="text-yellow-600">valued customers.</span>
+        <div className="mx-auto mb-14 max-w-3xl text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.45em] text-slate-400">
+            CUSTOMER STORIES
           </p>
 
-          <p className="mx-auto max-w-2xl text-lg leading-8 text-slate-500">
-            Thousands of happy customers trust Exepra for quality products and
-            exceptional service.
-          </p>
+          <h2 className="mt-5 text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
+            Loved by people
+            <br />
+            who shop thoughtfully.
+          </h2>
 
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-500 md:text-lg">
+            Discover what customers are saying about their Exepra experience.
+          </p>
         </div>
 
         {/* Testimonials */}
         <div className="overflow-hidden">
-
           <AnimatePresence mode="wait">
             <motion.div
               key={activePage}
-              initial={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
+              exit={{ opacity: 0, x: -24 }}
               transition={{
-                duration: 0.45,
+                duration: 0.4,
                 ease: "easeOut",
               }}
               className="grid gap-7 md:grid-cols-3"
             >
-
               {visibleTestimonials.map((testimonial) => (
                 <article
                   key={testimonial.name}
-                  className="
-                    rounded-[28px]
-                    border
-                    border-slate-200/70
-                    bg-white
-                    px-7
-                    py-4
-                    shadow-[0_12px_35px_rgba(15,23,42,0.05)]
-                    md:px-8
-                    md:py-7
-                  "
+                  className="group flex min-h-[330px] flex-col overflow-hidden rounded-[28px] border border-slate-200/80 bg-white px-7 py-8 shadow-[0_12px_35px_rgba(15,23,42,0.06)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.09)] md:px-8"
                 >
-
                   {/* Rating */}
-                  <div className="text-sm tracking-[0.2em] text-amber-400">
+                  <div
+                    className="text-[13px] tracking-[0.2em] text-amber-400"
+                    aria-label="5 out of 5 stars"
+                  >
                     ★★★★★
                   </div>
 
                   {/* Quote */}
-                  <p className="mt-7 text-lg leading-8 text-slate-600">
+                  <p className="mt-7 flex-1 text-[17px] leading-8 text-slate-600">
                     “{testimonial.quote}”
                   </p>
 
                   {/* Customer */}
-                  <div className="mt-4 items-center justify-end pt-2">
+                  <div className="mt-8 border-t border-slate-100 pt-5">
+                    <p className="text-sm font-semibold text-slate-900">
+                      {testimonial.name}
+                    </p>
 
-                    <div className="text-right">
-
-                      <p className="font-semibold text-slate-900">
-                        {testimonial.name}
-                      </p>
-
-                      <p className="text-sm text-slate-400">
-                        {testimonial.role}
-                      </p>
-                    </div>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {testimonial.role}
+                    </p>
                   </div>
-
                 </article>
               ))}
-
             </motion.div>
           </AnimatePresence>
-
         </div>
 
-        {/* Carousel Dots */}
-        <div className="mt-10 flex items-center justify-center gap-2">
+        {/* Moving Carousel Indicator */}
+        {totalPages > 1 && (
+          <div className="mx-auto mt-12 max-w-xs">
+            <div className="relative h-[2px] w-full bg-slate-200">
+              <motion.div
+                className="absolute top-1/2 h-[5px] w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-yellow-700"
+                animate={{
+                  left: `${indicatorPosition}%`,
+                }}
+                transition={{
+                  duration: 0.5,
+                  ease: "easeOut",
+                }}
+              />
 
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              aria-label={`Show testimonial group ${index + 1}`}
-              onClick={() => setActivePage(index)}
-              className={`
-                h-2.5
-                rounded-full
-                transition-all
-                duration-300
-                ${
-                  activePage === index
-                    ? "w-8 bg-slate-900"
-                    : "w-2.5 bg-slate-300 hover:bg-slate-400"
-                }
-              `}
-            />
-          ))}
-
-        </div>
-
+              {/* Clickable Areas */}
+              <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2">
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    aria-label={`Show testimonial group ${index + 1}`}
+                    onClick={() => setActivePage(index)}
+                    className="h-8 flex-1 cursor-pointer"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
