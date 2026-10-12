@@ -11,8 +11,16 @@ import {
   SlidersHorizontal,
   User,
   X,
+  ArrowUpRight,
+  Clock3,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { products } from "@/lib/products";
 
 const links = [
   { name: "Home & Living", href: "#" },
@@ -28,11 +36,27 @@ type CartItem = {
   quantity: number;
 };
 
+const formatPrice = (price: number) =>
+  new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(price);
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const [query, setQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [maxPrice, setMaxPrice] = useState("all");
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  const searchAreaRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   /* Scroll detection */
 
@@ -40,14 +64,14 @@ export default function Navbar() {
     let ticking = false;
 
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrolled(window.scrollY > 80);
-          ticking = false;
-        });
+      if (ticking) return;
 
-        ticking = true;
-      }
+      ticking = true;
+
+      window.requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 80);
+        ticking = false;
+      });
     };
 
     handleScroll();
@@ -77,7 +101,7 @@ export default function Navbar() {
     };
   }, []);
 
-  /* Lock background scrolling when menu is open */
+  /* Lock background scrolling for mobile menu */
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -96,14 +120,14 @@ export default function Navbar() {
   useEffect(() => {
     const updateCartCount = () => {
       try {
-        const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+        const saved = localStorage.getItem(CART_STORAGE_KEY);
 
-        if (!savedCart) {
+        if (!saved) {
           setCartCount(0);
           return;
         }
 
-        const cart: CartItem[] = JSON.parse(savedCart);
+        const cart: CartItem[] = JSON.parse(saved);
 
         setCartCount(
           cart.reduce((total, item) => total + item.quantity, 0)
@@ -129,17 +153,11 @@ export default function Navbar() {
   useEffect(() => {
     const updateWishlistCount = () => {
       try {
-        const savedWishlist = localStorage.getItem(
-          WISHLIST_STORAGE_KEY
+        const saved = localStorage.getItem(WISHLIST_STORAGE_KEY);
+
+        setWishlistCount(
+          saved ? (JSON.parse(saved) as string[]).length : 0
         );
-
-        if (!savedWishlist) {
-          setWishlistCount(0);
-          return;
-        }
-
-        const wishlist: string[] = JSON.parse(savedWishlist);
-        setWishlistCount(wishlist.length);
       } catch {
         setWishlistCount(0);
       }
@@ -159,25 +177,470 @@ export default function Navbar() {
     };
   }, []);
 
+  /* Recent searches */
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("exepra-recent-searches-v1");
+
+      if (saved) {
+        setRecentSearches(JSON.parse(saved));
+      }
+    } catch {
+      setRecentSearches([]);
+    }
+  }, []);
+
+  /* Close suggestions when clicking outside */
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        searchAreaRef.current &&
+        !searchAreaRef.current.contains(event.target as Node)
+      ) {
+        setSearchFocused(false);
+        setFiltersOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleOutsideClick
+      );
+    };
+  }, []);
+
+  /* Product search */
+
+  const categories = useMemo(
+    () => [
+      "All",
+      ...Array.from(new Set(products.map((p) => p.category))),
+    ],
+    []
+  );
+
+  const filteredProducts = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return products
+      .filter((product) => {
+        const matchesQuery =
+          !normalizedQuery ||
+          `${product.name} ${product.category}`
+            .toLowerCase()
+            .includes(normalizedQuery);
+
+        const matchesCategory =
+          selectedCategory === "All" ||
+          product.category === selectedCategory;
+
+        const matchesPrice =
+          maxPrice === "all" ||
+          product.price <= Number(maxPrice);
+
+        return matchesQuery && matchesCategory && matchesPrice;
+      })
+      .slice(0, 6);
+  }, [query, selectedCategory, maxPrice]);
+
+  const suggestionsOpen =
+    searchFocused && scrolled && !mobileMenuOpen;
+
+  const saveRecentSearch = (value: string) => {
+    const trimmed = value.trim();
+
+    if (!trimmed) return;
+
+    const updated = [
+      trimmed,
+      ...recentSearches.filter(
+        (item) => item.toLowerCase() !== trimmed.toLowerCase()
+      ),
+    ].slice(0, 5);
+
+    setRecentSearches(updated);
+
+    try {
+      localStorage.setItem(
+        "exepra-recent-searches-v1",
+        JSON.stringify(updated)
+      );
+    } catch {
+      // Search still works if localStorage is unavailable.
+    }
+  };
+
+  const openFirstResult = () => {
+    if (!filteredProducts.length) return;
+
+    saveRecentSearch(query);
+    window.location.href = `/products/${filteredProducts[0].id}`;
+  };
+
+  const handleSearchKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (event.key === "Escape") {
+      setSearchFocused(false);
+      setFiltersOpen(false);
+      searchInputRef.current?.blur();
+    }
+
+    if (
+      event.key === "Enter" &&
+      query.trim() &&
+      filteredProducts.length > 0
+    ) {
+      event.preventDefault();
+      openFirstResult();
+    }
+  };
+
+  const handleSearchSubmit = (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    if (query.trim() && filteredProducts.length > 0) {
+      openFirstResult();
+    }
+  };
+
+  const clearSearch = () => {
+    setQuery("");
+    setSelectedCategory("All");
+    setMaxPrice("all");
+    searchInputRef.current?.focus();
+  };
+
   const closeMobileMenu = () => setMobileMenuOpen(false);
+
+  /* Shared search experience */
+
+  const renderSearch = (mobile = false) => (
+    <div
+      ref={searchAreaRef}
+      className={`relative w-full ${mobile ? "" : "w-[620px] max-w-[60vw]"}`}
+    >
+      <form
+        role="search"
+        onSubmit={handleSearchSubmit}
+        className={`
+          relative flex h-[46px] w-full items-center
+          rounded-full border bg-white
+          transition-all duration-200
+          ${
+            searchFocused
+              ? "border-yellow-700/70 shadow-[0_0_0_3px_rgba(161,98,7,0.08)]"
+              : "border-slate-200 hover:border-slate-300"
+          }
+        `}
+      >
+        <Search
+          className="ml-4 h-5 w-5 shrink-0 text-slate-500"
+          strokeWidth={1.8}
+        />
+
+        <input
+          ref={mobile ? searchInputRef : undefined}
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onFocus={() => setSearchFocused(true)}
+          onKeyDown={handleSearchKeyDown}
+          placeholder="Search products, brands and more..."
+          aria-label="Search Exepra products"
+          aria-expanded={suggestionsOpen}
+          aria-controls="exepra-search-suggestions"
+          autoComplete="off"
+          className="
+            h-full min-w-0 flex-1 border-0
+            bg-transparent px-3 text-sm
+            text-slate-800 outline-none
+            placeholder:text-slate-400
+            focus:outline-none focus:ring-0
+          "
+        />
+
+        {query && (
+          <button
+            type="button"
+            onClick={clearSearch}
+            aria-label="Clear search"
+            className="
+              mr-1 flex h-8 w-8 shrink-0
+              items-center justify-center
+              rounded-full text-slate-400
+              hover:bg-slate-100 hover:text-slate-700
+            "
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+
+        <button
+          type="button"
+          onClick={() => {
+            setSearchFocused(true);
+            setFiltersOpen(!filtersOpen);
+          }}
+          aria-label="Search filters"
+          aria-expanded={filtersOpen}
+          className={`
+            mr-1.5 flex h-9 w-9 shrink-0
+            items-center justify-center rounded-full
+            transition-colors
+            ${
+              filtersOpen
+                ? "bg-yellow-50 text-yellow-800"
+                : "text-slate-600 hover:bg-slate-100"
+            }
+          `}
+        >
+          <SlidersHorizontal className="h-5 w-5" strokeWidth={1.8} />
+        </button>
+      </form>
+
+      {/* Suggestions and filters */}
+
+      {suggestionsOpen && (
+        <div
+          id="exepra-search-suggestions"
+          className="
+            absolute left-0 right-0 top-[calc(100%+10px)]
+            z-[80] max-h-[min(70vh,520px)] overflow-y-auto
+            rounded-2xl border border-slate-200
+            bg-white p-3
+            shadow-[0_20px_60px_rgba(15,23,42,0.16)]
+          "
+        >
+          {filtersOpen && (
+            <div className="mb-3 rounded-xl bg-slate-50 p-3">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-800">
+                  Refine your search
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedCategory("All");
+                    setMaxPrice("all");
+                  }}
+                  className="text-xs font-medium text-yellow-800 hover:text-yellow-900"
+                >
+                  Reset
+                </button>
+              </div>
+
+              <label
+                htmlFor="exepra-category-filter"
+                className="mb-1.5 block text-xs font-medium text-slate-600"
+              >
+                Category
+              </label>
+
+              <select
+                id="exepra-category-filter"
+                value={selectedCategory}
+                onChange={(event) =>
+                  setSelectedCategory(event.target.value)
+                }
+                className="
+                  mb-3 w-full rounded-lg border border-slate-200
+                  bg-white px-3 py-2 text-sm text-slate-700
+                  outline-none focus:border-yellow-700
+                "
+              >
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category === "All" ? "All categories" : category}
+                  </option>
+                ))}
+              </select>
+
+              <label
+                htmlFor="exepra-price-filter"
+                className="mb-1.5 block text-xs font-medium text-slate-600"
+              >
+                Maximum price
+              </label>
+
+              <select
+                id="exepra-price-filter"
+                value={maxPrice}
+                onChange={(event) => setMaxPrice(event.target.value)}
+                className="
+                  w-full rounded-lg border border-slate-200
+                  bg-white px-3 py-2 text-sm text-slate-700
+                  outline-none focus:border-yellow-700
+                "
+              >
+                <option value="all">Any price</option>
+                <option value="25">Up to €25</option>
+                <option value="50">Up to €50</option>
+                <option value="100">Up to €100</option>
+                <option value="200">Up to €200</option>
+              </select>
+            </div>
+          )}
+
+          {!query.trim() && recentSearches.length > 0 && (
+            <div className="mb-3">
+              <p className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                Recent searches
+              </p>
+
+              {recentSearches.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => {
+                    setQuery(item);
+                    setSearchFocused(true);
+                  }}
+                  className="
+                    flex w-full items-center gap-3
+                    rounded-lg px-2 py-2 text-left
+                    text-sm text-slate-600
+                    hover:bg-slate-50
+                  "
+                >
+                  <Clock3 className="h-4 w-4 text-slate-400" />
+                  <span className="flex-1">{item}</span>
+                  <ArrowUpRight className="h-4 w-4 text-slate-400" />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {query.trim() && (
+            <>
+              <div className="mb-2 flex items-center justify-between px-1">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                  Products
+                </p>
+
+                <span className="text-xs text-slate-400">
+                  {filteredProducts.length}{" "}
+                  {filteredProducts.length === 1 ? "match" : "matches"}
+                </span>
+              </div>
+
+              {filteredProducts.length > 0 ? (
+                <div className="space-y-1">
+                  {filteredProducts.map((product) => (
+                    <Link
+                      key={product.id}
+                      href={`/products/${product.id}`}
+                      onClick={() => {
+                        saveRecentSearch(query);
+                        setSearchFocused(false);
+                        setFiltersOpen(false);
+                      }}
+                      className="
+                        flex items-center gap-3 rounded-xl
+                        p-2 transition-colors hover:bg-slate-50
+                      "
+                    >
+                      <div className="
+                        flex h-14 w-14 shrink-0 items-center
+                        justify-center overflow-hidden rounded-lg
+                        bg-slate-50
+                      ">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-1 text-sm font-medium text-slate-800">
+                          {product.name}
+                        </p>
+
+                        <p className="mt-1 line-clamp-1 text-xs text-slate-500">
+                          {product.category}
+                        </p>
+
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="text-sm font-semibold text-slate-900">
+                            {formatPrice(product.price)}
+                          </span>
+
+                          {product.oldPrice && (
+                            <span className="text-xs text-slate-400 line-through">
+                              {formatPrice(product.oldPrice)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-400" />
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="px-3 py-7 text-center">
+                  <Search className="mx-auto mb-2 h-6 w-6 text-slate-300" />
+
+                  <p className="text-sm font-medium text-slate-700">
+                    No matching products found
+                  </p>
+
+                  <p className="mt-1 text-xs text-slate-500">
+                    Try another search or adjust your filters.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory("All");
+                      setMaxPrice("all");
+                    }}
+                    className="mt-3 text-sm font-medium text-yellow-800 hover:text-yellow-900"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {!query.trim() && recentSearches.length === 0 && (
+            <div className="px-2 py-4">
+              <p className="text-sm font-medium text-slate-700">
+                What are you looking for?
+              </p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                Search products by name or category to discover something you love.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
 
-      {/* =========================================
-          MOBILE HEADER
-      ========================================= */}
+      {/* MOBILE HEADER */}
 
       <div className="relative lg:hidden">
 
-        {/* TOP ROW: visible only before scrolling */}
+        {/* First row: visible only at the top */}
 
         <div
           aria-hidden={scrolled}
           className={`
-            absolute inset-x-0 top-0
-            z-10
-            bg-transparent
+            absolute inset-x-0 top-0 z-10
             transition-all duration-300
             ease-[cubic-bezier(0.22,1,0.36,1)]
             ${
@@ -187,26 +650,13 @@ export default function Navbar() {
             }
           `}
         >
-          <div
-            className="
-              relative flex h-[62px]
-              items-center justify-between
-              px-4 sm:h-[68px] sm:px-6
-            "
-          >
-            {/* Hamburger */}
-
+          <div className="relative flex h-[62px] items-center justify-between px-4 sm:h-[68px] sm:px-6">
             <button
               type="button"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileMenuOpen}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="
-                flex h-10 w-10 shrink-0
-                items-center justify-center
-                rounded-full text-white
-                transition-colors hover:bg-white/10
-              "
+              className="flex h-10 w-10 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10"
             >
               {mobileMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -215,8 +665,6 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* Centered logo */}
-
             <div className="absolute left-1/2 -translate-x-1/2">
               <ExepraLogo
                 light
@@ -224,33 +672,18 @@ export default function Navbar() {
               />
             </div>
 
-            {/* Wishlist and bag */}
-
             <div className="ml-auto flex items-center gap-1">
               <Link
                 href="/wishlist"
                 aria-label={`Wishlist${
-                  wishlistCount > 0
-                    ? `, ${wishlistCount} saved`
-                    : ""
+                  wishlistCount > 0 ? `, ${wishlistCount} saved` : ""
                 }`}
-                className="
-                  relative flex h-10 w-10
-                  items-center justify-center
-                  rounded-full text-white
-                  transition-colors hover:bg-white/10
-                "
+                className="relative flex h-10 w-10 items-center justify-center rounded-full text-white hover:bg-white/10"
               >
                 <Heart className="h-[22px] w-[22px]" strokeWidth={1.8} />
 
                 {wishlistCount > 0 && (
-                  <span className="
-                    absolute right-0.5 top-0.5
-                    flex h-[17px] min-w-[17px]
-                    items-center justify-center
-                    rounded-full bg-yellow-600 px-1
-                    text-[9px] font-bold text-white
-                  ">
+                  <span className="absolute right-0.5 top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-yellow-600 px-1 text-[9px] font-bold text-white">
                     {wishlistCount > 99 ? "99+" : wishlistCount}
                   </span>
                 )}
@@ -261,26 +694,12 @@ export default function Navbar() {
                 aria-label={`Shopping cart${
                   cartCount > 0 ? `, ${cartCount} items` : ""
                 }`}
-                className="
-                  relative flex h-10 w-10
-                  items-center justify-center
-                  rounded-full text-white
-                  transition-colors hover:bg-white/10
-                "
+                className="relative flex h-10 w-10 items-center justify-center rounded-full text-white hover:bg-white/10"
               >
-                <ShoppingBag
-                  className="h-[22px] w-[22px]"
-                  strokeWidth={1.8}
-                />
+                <ShoppingBag className="h-[22px] w-[22px]" strokeWidth={1.8} />
 
                 {cartCount > 0 && (
-                  <span className="
-                    absolute right-0.5 top-0.5
-                    flex h-[17px] min-w-[17px]
-                    items-center justify-center
-                    rounded-full bg-yellow-600 px-1
-                    text-[9px] font-bold text-white
-                  ">
+                  <span className="absolute right-0.5 top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-yellow-600 px-1 text-[9px] font-bold text-white">
                     {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
@@ -289,13 +708,12 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* SEARCH ROW: appears after scrolling */}
+        {/* Search row: visible only after scrolling */}
 
         <div
           aria-hidden={!scrolled}
           className={`
-            relative z-20
-            bg-white
+            relative z-20 bg-white
             transition-all duration-300
             ease-[cubic-bezier(0.22,1,0.36,1)]
             ${
@@ -306,63 +724,12 @@ export default function Navbar() {
           `}
         >
           <div className="flex h-[62px] items-center px-4 sm:h-[68px] sm:px-6">
-            <form
-              role="search"
-              onSubmit={(event) => event.preventDefault()}
-              className="
-                flex h-[44px] w-full
-                items-center rounded-full
-                border border-slate-200 bg-white
-                transition-all duration-200
-                focus-within:border-yellow-700/60
-                focus-within:shadow-[0_0_0_3px_rgba(161,98,7,0.07)]
-              "
-            >
-              <Search
-                className="ml-4 h-5 w-5 shrink-0 text-slate-500"
-                strokeWidth={1.8}
-              />
-
-              <input
-                type="search"
-                tabIndex={scrolled ? 0 : -1}
-                placeholder="Search products, brands and more..."
-                aria-label="Search products, brands and categories"
-                className="
-                  h-full min-w-0 flex-1
-                  border-0 bg-transparent
-                  px-3 text-[13px] text-slate-800
-                  outline-none placeholder:text-slate-400
-                  focus:outline-none focus:ring-0
-                  sm:text-sm
-                "
-              />
-
-              <button
-                type="button"
-                aria-label="Product filters"
-                title="Product filters"
-                tabIndex={scrolled ? 0 : -1}
-                className="
-                  mr-1.5 flex h-9 w-9 shrink-0
-                  items-center justify-center
-                  rounded-full text-slate-700
-                  transition-colors hover:bg-slate-100
-                "
-              >
-                <SlidersHorizontal
-                  className="h-5 w-5"
-                  strokeWidth={1.8}
-                />
-              </button>
-            </form>
+            {renderSearch(true)}
           </div>
         </div>
       </div>
 
-      {/* =========================================
-          DESKTOP NAVIGATION — PRESERVED
-      ========================================= */}
+      {/* DESKTOP NAVIGATION */}
 
       <nav
         className={`
@@ -383,8 +750,7 @@ export default function Navbar() {
         <div
           className={`
             absolute left-1/2 flex -translate-x-1/2
-            items-center gap-8
-            transition-all duration-300
+            items-center gap-8 transition-all duration-300
             ${
               scrolled
                 ? "pointer-events-none opacity-0"
@@ -397,9 +763,8 @@ export default function Navbar() {
               key={link.name}
               href={link.href}
               className={`
-                group relative whitespace-nowrap
-                py-2 text-sm font-medium
-                transition-colors duration-300
+                group relative whitespace-nowrap py-2
+                text-sm font-medium transition-colors duration-300
                 ${
                   scrolled
                     ? "text-slate-700 hover:text-yellow-700"
@@ -408,13 +773,12 @@ export default function Navbar() {
               `}
             >
               {link.name}
-
               <span
                 className={`
-                  absolute bottom-0 left-1/2
-                  h-[1.5px] w-full -translate-x-1/2
-                  scale-x-0 transition-transform duration-500
-                  ease-out group-hover:scale-x-100
+                  absolute bottom-0 left-1/2 h-[1.5px] w-full
+                  -translate-x-1/2 scale-x-0
+                  transition-transform duration-500 ease-out
+                  group-hover:scale-x-100
                   ${scrolled ? "bg-yellow-700" : "bg-white"}
                 `}
               />
@@ -422,10 +786,12 @@ export default function Navbar() {
           ))}
         </div>
 
+        {/* Functional desktop search after scrolling */}
+
         <div
           className={`
-            absolute left-1/2 -translate-x-1/2
-            transition-all duration-300 ease-out
+            absolute left-1/2 w-[620px] max-w-[55vw]
+            -translate-x-1/2 transition-all duration-300
             ${
               scrolled
                 ? "translate-y-0 opacity-100"
@@ -433,45 +799,17 @@ export default function Navbar() {
             }
           `}
         >
-          <div className="relative">
-            <Search
-              size={18}
-              strokeWidth={2}
-              className="
-                absolute left-4 top-1/2
-                -translate-y-1/2 text-slate-500
-              "
-            />
-
-            <input
-              type="search"
-              placeholder="Search. Find. Save."
-              aria-label="Search products"
-              className="
-                w-[620px] rounded-full
-                border border-slate-300 bg-white
-                py-2.5 pl-11 pr-4
-                text-md text-slate-700
-                placeholder:text-slate-400 shadow-sm
-                transition duration-300
-                focus:border-yellow-700 focus:outline-none
-                focus:ring-2 focus:ring-yellow-700/20
-              "
-            />
-          </div>
+          {renderSearch(false)}
         </div>
 
         <div className="ml-auto flex items-center gap-8">
           <Link href="/sign-in" aria-label="Sign in">
             <User
-              className={`
-                h-5 w-5 transition-colors
-                ${
-                  scrolled
-                    ? "text-slate-700 hover:text-yellow-700"
-                    : "text-white hover:text-yellow-500"
-                }
-              `}
+              className={`h-5 w-5 ${
+                scrolled
+                  ? "text-slate-700 hover:text-yellow-700"
+                  : "text-white hover:text-yellow-500"
+              }`}
             />
           </Link>
 
@@ -483,24 +821,15 @@ export default function Navbar() {
             className="relative flex h-10 w-10 items-center justify-center"
           >
             <Heart
-              className={`
-                h-5 w-5 transition-colors
-                ${
-                  scrolled
-                    ? "text-slate-700 hover:text-yellow-700"
-                    : "text-white hover:text-yellow-500"
-                }
-              `}
+              className={`h-5 w-5 ${
+                scrolled
+                  ? "text-slate-700 hover:text-yellow-700"
+                  : "text-white hover:text-yellow-500"
+              }`}
             />
 
             {wishlistCount > 0 && (
-              <span className="
-                absolute right-0 top-0
-                flex h-[17px] min-w-[17px]
-                items-center justify-center
-                rounded-full bg-yellow-600 px-1
-                text-[9px] font-bold text-white
-              ">
+              <span className="absolute right-0 top-0 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-yellow-600 px-1 text-[9px] font-bold text-white">
                 {wishlistCount > 99 ? "99+" : wishlistCount}
               </span>
             )}
@@ -514,24 +843,15 @@ export default function Navbar() {
             className="relative flex h-10 w-10 items-center justify-center"
           >
             <ShoppingBag
-              className={`
-                h-5 w-5 transition-colors
-                ${
-                  scrolled
-                    ? "text-slate-700 hover:text-yellow-700"
-                    : "text-white hover:text-yellow-500"
-                }
-              `}
+              className={`h-5 w-5 ${
+                scrolled
+                  ? "text-slate-700 hover:text-yellow-700"
+                  : "text-white hover:text-yellow-500"
+              }`}
             />
 
             {cartCount > 0 && (
-              <span className="
-                absolute right-0 top-0
-                flex h-[17px] min-w-[17px]
-                items-center justify-center
-                rounded-full bg-yellow-600 px-1
-                text-[9px] font-bold text-white
-              ">
+              <span className="absolute right-0 top-0 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-yellow-600 px-1 text-[9px] font-bold text-white">
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}
@@ -539,9 +859,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* =========================================
-          MOBILE MENU — COMPACT DROPDOWN
-      ========================================= */}
+      {/* MOBILE MENU */}
 
       <div
         className={`
@@ -558,30 +876,21 @@ export default function Navbar() {
           type="button"
           aria-label="Close menu"
           onClick={closeMobileMenu}
-          className="
-            absolute inset-0
-            bg-slate-950/20 backdrop-blur-sm
-          "
+          className="absolute inset-0 bg-slate-950/20 backdrop-blur-sm"
         />
 
         <button
           type="button"
           aria-label="Close menu"
           onClick={closeMobileMenu}
-          className="
-            absolute left-4 top-4 z-[70]
-            flex h-10 w-10 items-center justify-center
-            rounded-full text-white
-            transition hover:bg-white/10 sm:left-6
-          "
+          className="absolute left-4 top-4 z-[70] flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:bg-white/10 sm:left-6"
         >
           <X className="h-5 w-5" />
         </button>
 
         <div
           className={`
-            absolute left-4 top-[72px] z-[70]
-            w-[255px]
+            absolute left-4 top-[72px] z-[70] w-[255px]
             transition-all duration-300 ease-out
             sm:left-6 sm:top-20
             ${
@@ -591,23 +900,13 @@ export default function Navbar() {
             }
           `}
         >
-          <div className="
-            overflow-hidden rounded-2xl
-            border border-slate-200 bg-white p-2
-            shadow-[0_20px_50px_rgba(15,23,42,0.18)]
-          ">
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_20px_50px_rgba(15,23,42,0.18)]">
             {links.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
                 onClick={closeMobileMenu}
-                className="
-                  flex items-center justify-between
-                  rounded-xl px-3.5 py-2.5
-                  text-sm font-medium text-slate-800
-                  transition-colors
-                  hover:bg-slate-50 hover:text-yellow-700
-                "
+                className="flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-50 hover:text-yellow-700"
               >
                 {link.name}
                 <span className="text-base text-slate-400">›</span>
@@ -619,13 +918,7 @@ export default function Navbar() {
             <Link
               href="/sign-in"
               onClick={closeMobileMenu}
-              className="
-                flex items-center gap-3
-                rounded-xl px-3.5 py-2.5
-                text-sm font-medium text-slate-700
-                transition-colors
-                hover:bg-slate-50 hover:text-yellow-700
-              "
+              className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-yellow-700"
             >
               <User className="h-[18px] w-[18px] text-slate-500" />
               Sign in to Exepra
