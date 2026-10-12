@@ -353,7 +353,7 @@ export default function Navbar() {
           onChange={(event) => setQuery(event.target.value)}
           onFocus={() => setSearchFocused(true)}
           onKeyDown={handleSearchKeyDown}
-          placeholder="Search products, brands and more..."
+          placeholder="Search. Find. Save."
           aria-label="Search Exepra products"
           aria-expanded={suggestionsOpen}
           aria-controls="exepra-search-suggestions"
