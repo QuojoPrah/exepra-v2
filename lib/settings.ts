@@ -5,12 +5,16 @@ import { db } from "@/lib/db";
 export const getStoreSettings = cache(async () => {
   const existing = await db.storeSettings.findUnique({ where: { id: "store" } });
   if (existing) return existing;
-  return db.storeSettings.create({
-    data: {
-      id: "store",
-      announcements: ["Free standard shipping in Germany on orders over 75 €"],
-    },
-  });
+  try {
+    // First run on an empty database: create the singleton with neutral defaults.
+    return await db.storeSettings.create({ data: { id: "store", announcements: [] } });
+  } catch (err) {
+    // Several requests (or parallel prerender workers) may race to create it.
+    if ((err as { code?: string }).code === "P2002") {
+      return db.storeSettings.findUniqueOrThrow({ where: { id: "store" } });
+    }
+    throw err;
+  }
 });
 
 export const getShippingRules = cache(async () =>
