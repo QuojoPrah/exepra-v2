@@ -1,23 +1,15 @@
-import ProductCard from "./product-card";
-import { products } from "@/lib/products";
+import ProductCard from "@/components/product/product-card";
+import type { ProductSummary } from "@/lib/catalog";
+import { cn } from "@/lib/utils";
 
-export default function ProductGrid() {
+export default function ProductGrid({ products, className, priorityCount = 0 }: { products: ProductSummary[]; className?: string; priorityCount?: number }) {
   return (
-    <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
-      {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          id={String(product.id)}
-          name={product.name}
-          category={product.category}
-          image={product.image}
-          price={product.price}
-          oldPrice={product.oldPrice}
-          rating={product.rating}
-          reviews={product.reviews}
-          sale={product.sale}
-        />
+    <ul className={cn("grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4", className)}>
+      {products.map((p, i) => (
+        <li key={p.id} className="relative">
+          <ProductCard product={p} priority={i < priorityCount} />
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

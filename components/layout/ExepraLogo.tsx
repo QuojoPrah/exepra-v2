@@ -23,7 +23,7 @@ export default function ExepraLogo({
       {/* E */}
       <span
         className={`-skew-x-[6deg] origin-center font-bold tracking-[-0.050em] ${
-          light ? "text-white" : "text-slate-900"
+          light ? "text-white" : "text-ink"
         }`}
       >
         e
@@ -44,7 +44,7 @@ export default function ExepraLogo({
       {/* EPRA */}
       <span
         className={`-skew-x-[6deg] origin-center font-bold tracking-[-0.055em] ${
-          light ? "text-white" : "text-slate-900"
+          light ? "text-white" : "text-ink"
         }`}
       >
         epra

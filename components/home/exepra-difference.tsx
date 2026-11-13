@@ -1,124 +1,64 @@
 import Image from "next/image";
 import Link from "next/link";
+import { buttonClasses } from "@/components/ui/button";
 
 const principles = [
   {
-    number: "01",
     title: "Thoughtfully Curated",
-    description:
-      "Products selected with purpose, so you spend less time searching and more time discovering.",
+    description: "We focus on selecting products that bring quality, style, and practicality together.",
   },
   {
-    number: "02",
-    title: "Made for Everyday Life",
-    description:
-      "Useful pieces that bring together function, quality, and effortless style.",
+    title: "Designed for Everyday Living",
+    description: "Discover products that complement modern lifestyles and everyday needs.",
   },
   {
-    number: "03",
-    title: "A Better Way to Shop",
-    description:
-      "A considered marketplace built around discovery, trust, and simplicity.",
+    title: "A Better Shopping Experience",
+    description: "We believe shopping should be simple, convenient, and enjoyable.",
+  },
+  {
+    title: "Quality You Can Appreciate",
+    description: "Every selection should reflect our commitment to thoughtful choices and customer satisfaction.",
   },
 ];
 
-export default function WhyExepra() {
+export default function ExepraDifference() {
   return (
-    <section className="bg-white py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid items-center gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
-          {/* Image */}
-          <div className="relative min-h-[520px] overflow-hidden rounded-[32px] bg-slate-100 md:min-h-[620px]">
-            <Image
-              src="/images/cozyliving3.jpg"
-              alt="Thoughtfully curated Exepra lifestyle"
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover transition-transform duration-[1200ms] ease-out hover:scale-[1.025]"
-            />
+    <section className="py-20 sm:py-28" aria-labelledby="difference-heading">
+      <div className="container-page grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-20">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-[calc(var(--radius-card)*1.5)] bg-cream lg:aspect-[5/6]">
+          <Image src="/images/cozyliving3.jpg" alt="A calm, carefully styled interior" fill sizes="(max-width: 1024px) 100vw, 45vw" className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" aria-hidden />
+          <span className="absolute bottom-6 left-6 rounded-full border border-white/25 bg-black/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-md">
+            The EXEPRA way
+          </span>
+        </div>
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <div>
+          <p className="eyebrow">The EXEPRA Difference</p>
+          <h2 id="difference-heading" className="mt-4 max-w-xl text-4xl font-semibold leading-[1.08] sm:text-5xl">
+            Chosen with care,
+            <br />
+            made for real life.
+          </h2>
+          <p className="mt-5 max-w-lg leading-relaxed text-muted">
+            We don&apos;t aim to sell everything. We aim to offer the right things — pieces that feel good, look considered and earn their place in your everyday.
+          </p>
 
-            {/* Image Label */}
-            <div className="absolute bottom-7 left-7 md:bottom-9 md:left-9">
-              <div className="rounded-full border border-white/20 bg-black/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white backdrop-blur-md">
-                The Exepra Way
-              </div>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="lg:py-8">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.45em] text-slate-400">
-              THE EXEPRA DIFFERENCE
-            </p>
-
-            <h2 className="mt-5 max-w-2xl text-4xl font-semibold leading-[1.08] tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
-              Curated
-              <br />
-              with intention.
-            </h2>
-
-            <p className="mt-7 max-w-xl text-base leading-7 text-slate-500 md:text-lg md:leading-8">
-              We believe the things you bring into your life should be useful,
-              beautiful, and worth keeping. Exepra brings together thoughtfully
-              selected products for modern living — from everyday essentials to
-              pieces that simply make life better.
-            </p>
-
-            {/* Principles */}
-            <div className="mt-10 border-t border-slate-200">
-              {principles.map((principle) => (
-                <div
-                  key={principle.number}
-                  className="group grid grid-cols-[42px_1fr] gap-5 border-b border-slate-200 py-6 md:grid-cols-[50px_1fr] md:gap-6"
-                >
-                  <span className="pt-1 text-[10px] font-semibold tracking-[0.18em] text-yellow-700">
-                    {principle.number}
-                  </span>
-
-                  <div>
-                    <h3 className="text-base font-semibold text-slate-900 transition-colors duration-300 group-hover:text-yellow-700 md:text-lg">
-                      {principle.title}
-                    </h3>
-
-                    <p className="mt-2 max-w-lg text-sm leading-6 text-slate-500 md:text-[15px]">
-                      {principle.description}
-                    </p>
-                  </div>
+          <ol className="mt-10 divide-y divide-line border-y border-line">
+            {principles.map((p, i) => (
+              <li key={p.title} className="grid grid-cols-[3rem_minmax(0,1fr)] gap-4 py-6">
+                <span className="font-display text-sm font-medium text-bronze-deep tabular-nums">0{i + 1}</span>
+                <div>
+                  <h3 className="text-lg font-semibold">{p.title}</h3>
+                  <p className="mt-1.5 text-[0.95rem] leading-relaxed text-muted">{p.description}</p>
                 </div>
-              ))}
-            </div>
+              </li>
+            ))}
+          </ol>
 
-            {/* CTA */}
-            <Link
-              href="/about"
-              className="group mt-9 inline-flex items-center gap-3 text-sm font-semibold text-slate-900"
-            >
-              <span>Discover the Exepra story</span>
-
-              <span
-                aria-hidden="true"
-                className="flex items-center transition-transform duration-300 group-hover:translate-x-1"
-              >
-                <svg
-                  width="7"
-                  height="12"
-                  viewBox="0 0 7 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M1 1L6 6L1 11"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-            </Link>
-          </div>
+          <Link href="/about" className={buttonClasses("outline", "md", "mt-10")}>
+            Our story
+          </Link>
         </div>
       </div>
     </section>
