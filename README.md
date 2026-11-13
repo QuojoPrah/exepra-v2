@@ -158,7 +158,7 @@ The admin e2e test needs `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD` for a **local 
 5. **Seed?** Do **not** seed demo products in production. Instead create categories, products, shipping rates and hero slides in the admin. (Shipping rates and settings can be bootstrapped by running the seed once and then deleting the demo products/coupon, if you prefer.)
 6. **Admin:** run `npm run admin:create` locally with `DATABASE_URL` pointing at production.
 7. **Stripe webhook:** add the production endpoint (see above) and set `STRIPE_WEBHOOK_SECRET`.
-8. **Cron:** `vercel.json` schedules `/api/cron/release-stock` every 30 minutes (requires a Vercel Pro plan; on Hobby change it to daily). Set `CRON_SECRET`.
+8. **Cron:** `vercel.json` runs `/api/cron/release-stock` daily at 03:00 UTC (the Hobby plan only allows daily jobs; on Pro you can run it every 30 minutes). Abandoned checkouts are normally released sooner by Stripe's `checkout.session.expired` webhook. Set `CRON_SECRET`.
 9. **Domain:** Vercel → Project → Domains → add `your-domain.de` and `www.your-domain.de`; set the DNS records shown (A/ALIAS for apex, CNAME for www). HTTPS certificates are issued automatically. Then update `NEXT_PUBLIC_SITE_URL` and `BETTER_AUTH_URL` to `https://your-domain.de` and redeploy.
 10. **Search engines:** submit `https://your-domain.de/sitemap.xml` in Google Search Console. `robots.txt` blocks indexing on non-production (preview) deployments automatically. Product pages include `Product` + `BreadcrumbList` structured data (ratings only when real approved reviews exist), ready for Google Merchant Center.
 11. **Error logging:** Vercel captures server logs (Project → Logs). For alerting, add Sentry (`npx @sentry/wizard@latest -i nextjs`) or a log drain.
