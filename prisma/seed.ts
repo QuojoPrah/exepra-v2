@@ -245,6 +245,13 @@ async function main() {
     });
   }
 
+  // Set SEED_DEMO_PRODUCTS=false to seed only the store setup (e.g. on a production database).
+  if (process.env.SEED_DEMO_PRODUCTS === "false") {
+    console.log("Skipping demo products and demo coupon (SEED_DEMO_PRODUCTS=false).");
+    console.log("Seed complete. Create an admin with: npm run admin:create -- <email> <name>");
+    return;
+  }
+
   console.log(`Seeding ${products.length} demo products…`);
   for (const p of products) {
     const exists = await db.product.findUnique({ where: { slug: p.slug } });

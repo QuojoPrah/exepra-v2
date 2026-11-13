@@ -17,7 +17,9 @@
     "admin:create": "tsx scripts/create-admin.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "db:seed:setup": "SEED_DEMO_PRODUCTS=false prisma db seed"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",

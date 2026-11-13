@@ -10,6 +10,7 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env.DIRECT_URL || process.env.DATABASE_URL || "",
+    // DATABASE_URL_UNPOOLED is set automatically by the Vercel Neon integration.
+    url: process.env.DIRECT_URL || process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL || "",
   },
 });
