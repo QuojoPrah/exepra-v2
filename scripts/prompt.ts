@@ -1,11 +1,20 @@
 import { createInterface } from "node:readline/promises";
 
+/** Removes bracketed-paste markers some terminals wrap around pasted text, and surrounding spaces/quotes. */
+export function clean(v: string): string {
+  return v
+    .replace(/\x1b?\[20[01]~/g, "")
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .trim();
+}
+
 /** Reads a line from the terminal without echoing it. */
 export function askHidden(prompt: string): Promise<string> {
   const stdin = process.stdin;
   if (!stdin.isTTY) {
     const rl = createInterface({ input: stdin });
-    return rl.question(prompt).finally(() => rl.close());
+    return rl.question(prompt).then(clean).finally(() => rl.close());
   }
   process.stdout.write(prompt);
   return new Promise((resolve) => {
@@ -20,7 +29,7 @@ export function askHidden(prompt: string): Promise<string> {
           stdin.pause();
           stdin.off("data", onData);
           process.stdout.write("\n");
-          resolve(value.trim());
+          resolve(clean(value));
           return;
         }
         if (ch === "\u0003") {

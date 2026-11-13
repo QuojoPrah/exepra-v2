@@ -32,10 +32,17 @@ async function main() {
     if (m) [key, secret, cloud] = [m[1], m[2], m[3]];
   }
 
+  // Describe a value without revealing it: length and kinds of characters.
+  const describe = (v: string) => {
+    if (!v) return "nothing was received";
+    const kinds = [/[a-z]/.test(v) && "lowercase letters", /[A-Z]/.test(v) && "capital letters", /\d/.test(v) && "digits", /[^A-Za-z0-9]/.test(v) && "symbols/spaces"].filter(Boolean);
+    return `received ${v.length} characters (${kinds.join(", ")})`;
+  };
+
   const problems: string[] = [];
-  if (!/^[a-z0-9-_]+$/i.test(cloud)) problems.push("The cloud name should be a short word like 'dxyz12345' (letters, digits, dashes).");
-  if (!/^\d{6,}$/.test(key)) problems.push("The API key should contain only digits — you may have copied the key's name (e.g. 'Root') or the secret.");
-  if (!/^[\w-]{10,}$/.test(secret)) problems.push("The API secret looks incomplete.");
+  if (!/^[a-z0-9-_]+$/i.test(cloud)) problems.push(`Cloud name: ${describe(cloud)}. It should be a short word like 'dxyz12345'.`);
+  if (!/^\d{6,}$/.test(key)) problems.push(`API key: ${describe(key)}. It should be only digits (usually 15) — the 'API Key' column, not 'Key Name' (e.g. 'Root') or the secret.`);
+  if (!/^[\w-]{10,}$/.test(secret)) problems.push(`API secret: ${describe(secret)}. It should be about 27 letters/digits (may include - or _) — click the eye icon first, then copy.`);
   if (problems.length) {
     problems.forEach((p) => console.error(`✘ ${p}`));
     console.error("\nNothing was saved. Run `npm run cloudinary:setup` again.");
