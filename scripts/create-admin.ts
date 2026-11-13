@@ -17,12 +17,50 @@ import { PrismaClient } from "../lib/generated/prisma/client";
 
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) });
 
+/** Reads a line without echoing it to the terminal. */
+function askHidden(prompt: string): Promise<string> {
+  const stdin = process.stdin;
+  if (!stdin.isTTY) {
+    const rl = createInterface({ input: stdin });
+    return rl.question(prompt).finally(() => rl.close());
+  }
+  process.stdout.write(prompt);
+  return new Promise((resolve) => {
+    let value = "";
+    stdin.setRawMode(true);
+    stdin.resume();
+    stdin.setEncoding("utf8");
+    const onData = (chunk: string) => {
+      for (const ch of chunk) {
+        if (ch === "\r" || ch === "\n") {
+          stdin.setRawMode(false);
+          stdin.pause();
+          stdin.off("data", onData);
+          process.stdout.write("\n");
+          resolve(value);
+          return;
+        }
+        if (ch === "\u0003") {
+          process.stdout.write("\n");
+          process.exit(130); // Ctrl-C
+        }
+        if (ch === "\u007f" || ch === "\b") value = value.slice(0, -1);
+        else if (ch >= " ") value += ch;
+      }
+    };
+    stdin.on("data", onData);
+  });
+}
+
 async function readPassword(): Promise<string> {
   if (process.env.ADMIN_PASSWORD) return process.env.ADMIN_PASSWORD;
-  const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-  const answer = await rl.question("Password for the new admin (min. 12 chars): ");
-  rl.close();
-  return answer;
+  const first = await askHidden("Password for the new admin (min. 12 chars, hidden): ");
+  const second = await askHidden("Repeat the password: ");
+  if (first !== second) {
+    console.error("Passwords do not match.");
+    process.exit(1);
+  }
+  return first;
 }
 
 async function main() {
