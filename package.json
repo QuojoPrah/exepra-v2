@@ -19,7 +19,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
-    "db:seed:setup": "SEED_DEMO_PRODUCTS=false prisma db seed"
+    "db:seed:setup": "SEED_DEMO_PRODUCTS=false prisma db seed",
+    "stripe:setup": "tsx scripts/stripe-setup.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",

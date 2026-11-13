@@ -10,47 +10,12 @@
  */
 import "dotenv/config";
 import { randomUUID } from "node:crypto";
-import { createInterface } from "node:readline/promises";
 import { hashPassword } from "better-auth/crypto";
+import { askHidden } from "./prompt";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
 
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, max: 1 }) });
-
-/** Reads a line without echoing it to the terminal. */
-function askHidden(prompt: string): Promise<string> {
-  const stdin = process.stdin;
-  if (!stdin.isTTY) {
-    const rl = createInterface({ input: stdin });
-    return rl.question(prompt).finally(() => rl.close());
-  }
-  process.stdout.write(prompt);
-  return new Promise((resolve) => {
-    let value = "";
-    stdin.setRawMode(true);
-    stdin.resume();
-    stdin.setEncoding("utf8");
-    const onData = (chunk: string) => {
-      for (const ch of chunk) {
-        if (ch === "\r" || ch === "\n") {
-          stdin.setRawMode(false);
-          stdin.pause();
-          stdin.off("data", onData);
-          process.stdout.write("\n");
-          resolve(value);
-          return;
-        }
-        if (ch === "\u0003") {
-          process.stdout.write("\n");
-          process.exit(130); // Ctrl-C
-        }
-        if (ch === "\u007f" || ch === "\b") value = value.slice(0, -1);
-        else if (ch >= " ") value += ch;
-      }
-    };
-    stdin.on("data", onData);
-  });
-}
 
 async function readPassword(): Promise<string> {
   if (process.env.ADMIN_PASSWORD) return process.env.ADMIN_PASSWORD;
