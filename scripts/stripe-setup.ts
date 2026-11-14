@@ -1,5 +1,9 @@
 /**
- * Connects Stripe (TEST mode) to the Vercel preview of this branch:
+ * LIVE mode:  npm run stripe:setup:live
+ *   asks for the live secret key, checks the account may take payments, creates the
+ *   webhook for https://www.exepra.com and saves both secrets to Vercel Production only.
+ *
+ * TEST mode (default) connects Stripe to the Vercel preview of the feature branch:
  *  1. asks for your Stripe test secret key (hidden),
  *  2. creates a webhook endpoint in Stripe pointing at the preview
  *     (using Vercel's automation-bypass token so Stripe gets past Deployment Protection),
@@ -11,6 +15,8 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { askHidden } from "./prompt";
 
+const LIVE = process.argv.includes("--live");
+const LIVE_URL = "https://www.exepra.com";
 const PROJECT = "exepra-v2";
 const PREVIEW_URL = "https://exepra-v2-git-feature-full-ecommerce-platform-exepra.vercel.app";
 const EVENTS = [
@@ -46,42 +52,57 @@ async function stripe(key: string, path: string, body?: URLSearchParams) {
 }
 
 async function main() {
-  console.log("Stripe → Vercel preview setup (test mode)\n");
-  const key = await askHidden("Paste your Stripe TEST secret key (starts with sk_test_), then Enter (hidden): ");
-  if (!key.startsWith("sk_test_") && !key.startsWith("rk_test_")) {
-    console.error("✘ That isn't a test-mode secret key. In Stripe, switch on 'Test mode' and copy the Secret key (sk_test_…).");
+  const mode = LIVE ? "live" : "test";
+  console.log(LIVE ? `Stripe → ${LIVE_URL} setup (LIVE mode — real payments)\n` : "Stripe → Vercel preview setup (test mode)\n");
+  const key = await askHidden(`Paste your Stripe ${mode.toUpperCase()} secret key (starts with sk_${mode}_), then Enter (hidden): `);
+  if (!key.startsWith(`sk_${mode}_`) && !key.startsWith(`rk_${mode}_`)) {
+    console.error(
+      LIVE
+        ? "✘ That isn't a live secret key. In Stripe, leave the sandbox / switch off 'Test mode', then copy the Secret key (sk_live_…). Nothing was saved."
+        : "✘ That isn't a test-mode secret key. In Stripe, switch on 'Test mode' and copy the Secret key (sk_test_…).",
+    );
     process.exit(1);
   }
 
   const account = await stripe(key, "account");
   console.log(`✔ Key works — Stripe account: ${account.settings?.dashboard?.display_name || account.business_profile?.name || account.id}`);
 
-  const base = `${PREVIEW_URL}/api/webhooks/stripe`;
-  const url = `${base}?x-vercel-protection-bypass=${bypassToken()}`;
+  if (LIVE && !account.charges_enabled) {
+    console.error("✘ This Stripe account can't accept live payments yet. Finish the business verification in the Stripe dashboard");
+    console.error("  (it shows what is still missing), then run this command again. Nothing was saved.");
+    process.exit(1);
+  }
+  if (LIVE) console.log("✔ Account is enabled for live payments");
+
+  const base = `${LIVE ? LIVE_URL : PREVIEW_URL}/api/webhooks/stripe`;
+  // The live site is public; only the protected preview needs Vercel's bypass token.
+  const url = LIVE ? base : `${base}?x-vercel-protection-bypass=${bypassToken()}`;
 
   // Remove earlier endpoints for this preview so events aren't delivered twice.
   const existing = await stripe(key, "webhook_endpoints?limit=100");
   for (const ep of existing.data as { id: string; url: string }[]) {
     if (ep.url.startsWith(base)) {
       await fetch(`https://api.stripe.com/v1/webhook_endpoints/${ep.id}`, { method: "DELETE", headers: { Authorization: `Bearer ${key}` } });
-      console.log("✔ Replaced an earlier webhook for this preview");
+      console.log("✔ Replaced an earlier webhook for this site");
     }
   }
 
-  const form = new URLSearchParams({ url, description: "EXEPRA preview (feature/full-ecommerce-platform)" });
+  const form = new URLSearchParams({ url, description: LIVE ? "EXEPRA live store (www.exepra.com)" : "EXEPRA preview (feature/full-ecommerce-platform)" });
   EVENTS.forEach((e) => form.append("enabled_events[]", e));
   const endpoint = await stripe(key, "webhook_endpoints", form);
   console.log(`✔ Webhook created in Stripe (${endpoint.id}) for ${EVENTS.length} events`);
 
-  vercel(["env", "add", "STRIPE_SECRET_KEY", "--environment", "preview", "--yes", "--force"], key);
-  vercel(["env", "add", "STRIPE_WEBHOOK_SECRET", "--environment", "preview", "--yes", "--force"], endpoint.secret);
+  const target = LIVE ? "production" : "preview";
+  const label = LIVE ? "Production" : "Preview";
+  vercel(["env", "add", "STRIPE_SECRET_KEY", "--environment", target, "--yes", "--force"], key);
+  vercel(["env", "add", "STRIPE_WEBHOOK_SECRET", "--environment", target, "--yes", "--force"], endpoint.secret);
 
   const list = execFileSync("npx", ["-y", "vercel@latest", "env", "ls"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
   for (const name of ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]) {
-    const ok = list.split("\n").some((l) => l.trim().startsWith(name + " ") && l.includes("Preview"));
-    console.log(`${ok ? "✔" : "✘"} ${name} ${ok ? "is set for Preview" : "is NOT set — please tell Claude"}`);
+    const ok = list.split("\n").some((l) => l.trim().startsWith(name + " ") && l.includes(label));
+    console.log(`${ok ? "✔" : "✘"} ${name} ${ok ? `is set for ${label}` : "is NOT set — please tell Claude"}`);
   }
-  console.log("\nDone. Redeploy the preview for the keys to take effect.");
+  console.log(`\nDone. Redeploy ${LIVE ? "the live site" : "the preview"} for the keys to take effect.`);
 }
 
 main().catch((e) => {

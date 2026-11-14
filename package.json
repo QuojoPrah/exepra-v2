@@ -22,7 +22,8 @@
     "db:seed:setup": "SEED_DEMO_PRODUCTS=false prisma db seed",
     "stripe:setup": "tsx scripts/stripe-setup.ts",
     "cloudinary:setup": "tsx scripts/cloudinary-setup.ts",
-    "resend:setup": "tsx scripts/resend-setup.ts"
+    "resend:setup": "tsx scripts/resend-setup.ts",
+    "stripe:setup:live": "tsx scripts/stripe-setup.ts --live"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
