@@ -525,6 +525,8 @@ model StoreSettings {
   currency           String   @default("EUR")
   defaultVatRate     Int      @default(19)
   pricesIncludeVat   Boolean  @default(true)
+  /// Kleinunternehmer (§ 19 UStG): no VAT is charged or shown.
+  smallBusiness      Boolean  @default(false)
   announcements      String[] // rotating announcement bar messages
   announcementActive Boolean  @default(true)
   instagramUrl       String?

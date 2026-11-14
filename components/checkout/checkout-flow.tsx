@@ -10,6 +10,7 @@ import { useCart } from "@/components/providers/store-providers";
 import { Button, LinkButton } from "@/components/ui/button";
 import ExepraLogo from "@/components/layout/ExepraLogo";
 import { formatPrice } from "@/lib/money";
+import { vatNote } from "@/components/ui/vat-note";
 import { FALLBACK_IMAGE } from "@/lib/site";
 import { addressSchema, emailSchema, fieldErrors, isValidPostalCode } from "@/lib/validation";
 import { cn } from "@/lib/utils";
@@ -579,7 +580,7 @@ export function CheckoutFlow({
               <dt>Total</dt>
               <dd className="tabular-nums">{formatPrice(quote?.total ?? cart.total)}</dd>
             </div>
-            <p className="text-xs text-muted">Includes {formatPrice(quote?.tax ?? cart.tax)} VAT</p>
+            <p className="text-xs text-muted">{vatNote(quote?.tax ?? cart.tax)}</p>
           </dl>
           <div className="mt-6 hidden border-t border-line pt-5 lg:block">
             <ExepraLogo className="text-xl" />

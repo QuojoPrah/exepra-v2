@@ -16,7 +16,7 @@ export function LegalPage({ title, subtitle, lang = "de", children, draft = true
         <div className="mt-6 flex gap-3 rounded-xl border border-[#c9a24a] bg-[#fff8e6] p-4 text-sm text-[#5c4410]" role="note" lang="en">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
           <p>
-            <strong>Draft template — not legal advice.</strong> Highlighted fields must be completed by the business owner and the full text reviewed by a qualified lawyer (or a legal text service such as IT-Recht Kanzlei, Händlerbund or Trusted Shops) before EXEPRA accepts real orders.
+            <strong>Pending legal review.</strong> This text has been completed with the business details but has not yet been reviewed by a lawyer.
           </p>
         </div>
       )}

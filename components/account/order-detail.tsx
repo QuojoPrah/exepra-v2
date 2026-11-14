@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatPrice } from "@/lib/money";
+import { vatNote } from "@/components/ui/vat-note";
 import { FALLBACK_IMAGE } from "@/lib/site";
 import { formatDate } from "@/lib/utils";
 import type { AddressSnapshot } from "@/lib/orders";
@@ -120,7 +121,7 @@ export function OrderDetail({ order }: { order: Order }) {
             <dt>Total</dt>
             <dd>{formatPrice(order.total)}</dd>
           </div>
-          <p className="text-xs text-muted">Incl. {formatPrice(order.taxTotal)} VAT · Payment: <StatusBadge status={order.paymentStatus} kind="payment" /></p>
+          <p className="text-xs text-muted">{vatNote(order.taxTotal)} Payment: <StatusBadge status={order.paymentStatus} kind="payment" /></p>
         </dl>
       </section>
 

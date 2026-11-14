@@ -8,6 +8,7 @@ import { Modal } from "@/components/ui/modal";
 import { LinkButton } from "@/components/ui/button";
 import { useCart, useUI } from "@/components/providers/store-providers";
 import { formatPrice } from "@/lib/money";
+import { SMALL_BUSINESS_NOTE } from "@/components/ui/vat-note";
 import { FALLBACK_IMAGE } from "@/lib/site";
 import type { CartLine } from "@/lib/cart";
 
@@ -136,7 +137,7 @@ export function CartDrawer() {
                 <dd className="tabular-nums">{cart!.shipping === 0 ? "Free" : formatPrice(cart!.shipping)}</dd>
               </div>
             </dl>
-            <p className="mt-1 text-xs text-muted">Incl. VAT. Shipping shown for Germany; final cost confirmed at checkout.</p>
+            <p className="mt-1 text-xs text-muted">{cart!.tax > 0 ? "Incl. VAT." : SMALL_BUSINESS_NOTE} Shipping shown for Germany; final cost confirmed at checkout.</p>
             <div className="mt-4 grid gap-2">
               <LinkButton href="/checkout" size="lg" className="h-12" onClick={closeDrawer} aria-disabled={cart!.hasIssues}>
                 Checkout · {formatPrice(cart!.total)}

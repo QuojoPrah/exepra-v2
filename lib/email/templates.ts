@@ -1,4 +1,5 @@
 import { formatPrice } from "@/lib/money";
+import { vatNote } from "@/components/ui/vat-note";
 
 const site = () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -54,7 +55,7 @@ ${line("Subtotal", formatPrice(o.subtotal))}
 ${o.discountTotal ? line("Discount", "−" + formatPrice(o.discountTotal)) : ""}
 ${line(`Shipping (${esc(o.shippingLabel)})`, o.shippingTotal ? formatPrice(o.shippingTotal) : "Free")}
 ${line("Total", formatPrice(o.total), true)}
-<tr><td colspan="2" style="color:#7a726a;font-size:12px">Includes ${formatPrice(o.taxTotal)} VAT</td></tr></table>
+<tr><td colspan="2" style="color:#7a726a;font-size:12px">${vatNote(o.taxTotal)}</td></tr></table>
 <p style="margin:0;font-size:14px"><strong>Delivery address</strong><br>${esc(a.firstName)} ${esc(a.lastName)}<br>${esc(a.street)} ${esc(a.houseNumber)}<br>${esc(a.postalCode)} ${esc(a.city)}<br>${esc(a.country)}</p>`;
 }
 
@@ -64,7 +65,7 @@ function orderText(o: OrderEmailData) {
     `Subtotal: ${formatPrice(o.subtotal)}`,
     o.discountTotal ? `Discount: -${formatPrice(o.discountTotal)}` : "",
     `Shipping: ${o.shippingTotal ? formatPrice(o.shippingTotal) : "Free"}`,
-    `Total: ${formatPrice(o.total)} (incl. ${formatPrice(o.taxTotal)} VAT)`,
+    `Total: ${formatPrice(o.total)}. ${vatNote(o.taxTotal)}`,
   ]
     .filter(Boolean)
     .join("\n");

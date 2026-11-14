@@ -431,6 +431,7 @@ export async function saveStoreSettings(_: ActionState, fd: FormData): Promise<A
       contactEmail: email,
       contactPhone: optional(fd, "contactPhone"),
       defaultVatRate: Math.min(30, Math.max(0, int(fd, "defaultVatRate", 19))),
+      smallBusiness: bool(fd, "smallBusiness"),
       instagramUrl: url("instagramUrl"),
       facebookUrl: url("facebookUrl"),
       tiktokUrl: url("tiktokUrl"),

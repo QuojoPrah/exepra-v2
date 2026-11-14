@@ -8,6 +8,7 @@ import { useCart } from "@/components/providers/store-providers";
 import { Button, LinkButton } from "@/components/ui/button";
 import { FreeShippingProgress, LineIssue, QuantityStepper } from "@/components/cart/cart-drawer";
 import { formatPrice } from "@/lib/money";
+import { vatNote } from "@/components/ui/vat-note";
 import { FALLBACK_IMAGE } from "@/lib/site";
 
 export function OrderSummary({ showCoupon = true }: { showCoupon?: boolean }) {
@@ -78,7 +79,7 @@ export function OrderSummary({ showCoupon = true }: { showCoupon?: boolean }) {
           <dt>Total</dt>
           <dd className="tabular-nums">{formatPrice(cart.total)}</dd>
         </div>
-        <p className="text-xs text-muted">Includes {formatPrice(cart.tax)} VAT. Final shipping is calculated for your address at checkout.</p>
+        <p className="text-xs text-muted">{vatNote(cart.tax)} Final shipping is calculated for your address at checkout.</p>
       </dl>
     </div>
   );

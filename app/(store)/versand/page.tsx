@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/content/legal-page";
-import { getShippingRules } from "@/lib/settings";
+import { getShippingRules, getStoreSettings } from "@/lib/settings";
 import { formatPrice } from "@/lib/money";
 import { SUPPORTED_COUNTRIES } from "@/lib/validation";
 
@@ -8,11 +8,11 @@ export const metadata: Metadata = { title: "Versandinformationen", description: 
 export const revalidate = 600;
 
 export default async function VersandPage() {
-  const rules = await getShippingRules();
+  const [rules, settings] = await Promise.all([getShippingRules(), getStoreSettings()]);
   const name = (c: string) => SUPPORTED_COUNTRIES.find((x) => x.code === c)?.name ?? c;
   return (
     <LegalPage title="Versandinformationen" subtitle="Shipping information" lang="en" draft={false}>
-      <p>All prices include VAT. Shipping costs depend on the destination and delivery method and are shown before you pay. Delivery times are in business days (Mon–Fri) after payment has been received.</p>
+      <p>{settings.smallBusiness ? "All prices are final prices; as a small business under § 19 UStG we do not charge VAT." : "All prices include VAT."} Shipping costs depend on the destination and delivery method and are shown before you pay. Delivery times are in business days (Mon–Fri) after payment has been received.</p>
       <div className="not-prose mt-6 overflow-x-auto rounded-[var(--radius-card)] border border-line bg-white">
         <table className="w-full min-w-[520px] text-left text-sm">
           <thead className="border-b border-line text-xs uppercase tracking-wider text-muted">

@@ -39,7 +39,7 @@ const columns = [
   },
 ];
 
-type Social = { instagramUrl: string | null; facebookUrl: string | null; tiktokUrl: string | null; pinterestUrl: string | null };
+type Social = { instagramUrl: string | null; facebookUrl: string | null; tiktokUrl: string | null; pinterestUrl: string | null; smallBusiness?: boolean };
 
 const socialIcons: Record<string, React.ReactNode> = {
   Instagram: (
@@ -107,7 +107,7 @@ export default function Footer({ social, tagline }: { social: Social; tagline?: 
 
       <div className="border-t border-white/10">
         <div className="container-page flex flex-col gap-5 py-7 text-xs lg:flex-row lg:items-center lg:justify-between">
-          <p>© {new Date().getFullYear()} EXEPRA. All rights reserved. Prices include VAT, plus shipping.</p>
+          <p>© {new Date().getFullYear()} EXEPRA. All rights reserved. {social.smallBusiness ? "Final prices, plus shipping. No VAT is charged (§ 19 UStG)." : "Prices include VAT, plus shipping."}</p>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <span className="flex items-center gap-1.5">
               <Lock className="h-3.5 w-3.5" aria-hidden /> Secure checkout by Stripe · payment options shown at checkout

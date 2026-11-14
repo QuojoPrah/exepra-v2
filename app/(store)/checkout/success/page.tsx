@@ -7,6 +7,7 @@ import { PaymentPoller } from "@/components/checkout/payment-poller";
 import { CartRefresher } from "@/components/checkout/cart-refresher";
 import { db } from "@/lib/db";
 import { formatPrice } from "@/lib/money";
+import { vatNote } from "@/components/ui/vat-note";
 import { FALLBACK_IMAGE } from "@/lib/site";
 import type { AddressSnapshot } from "@/lib/orders";
 
@@ -130,7 +131,7 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps<"/
               <dt>Total</dt>
               <dd>{formatPrice(order.total)}</dd>
             </div>
-            <p className="text-xs text-muted">Incl. {formatPrice(order.taxTotal)} VAT</p>
+            <p className="text-xs text-muted">{vatNote(order.taxTotal)}</p>
           </dl>
         </div>
       </section>

@@ -1,20 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { getStoreSettings } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "FAQ", description: "Answers to common questions about orders, shipping, payment and returns at EXEPRA.", alternates: { canonical: "/faq" } };
 
-const faqs: { q: string; a: React.ReactNode; text: string }[] = [
+const baseFaqs: { q: string; a: React.ReactNode; text: string }[] = [
   { q: "Which countries do you deliver to?", text: "We currently deliver to Germany and selected EU countries. Available destinations and costs are shown at checkout and on our shipping page.", a: <>We currently deliver to Germany and selected EU countries. Available destinations and costs are shown at checkout and on our <Link href="/versand">shipping page</Link>.</> },
   { q: "How long does delivery take?", text: "Delivery times depend on the method you choose and are shown at checkout. Orders ship once payment has been confirmed.", a: <>Delivery times depend on the method you choose and are shown at checkout. Orders ship once payment has been confirmed.</> },
   { q: "Which payment methods can I use?", text: "Payments are processed securely by Stripe. The payment methods available to you are displayed on the payment page.", a: <>Payments are processed securely by Stripe. The payment methods available to you are displayed on the payment page.</> },
   { q: "Do I need an account to order?", text: "No — you can check out as a guest. An account lets you track orders, save addresses and keep your wishlist across devices.", a: <>No — you can check out as a guest. An account lets you track orders, save addresses and keep your wishlist across devices.</> },
   { q: "How do I track my order?", text: "You'll receive an email when your order ships. You can also enter your order number and email on our Track Order page.", a: <>You&apos;ll receive an email when your order ships. You can also enter your order number and email on our <Link href="/track-order">Track Order</Link> page.</> },
   { q: "Can I return an item?", text: "Yes. You have a statutory 14-day right of withdrawal. See our returns page and cancellation policy for details.", a: <>Yes. You have a statutory 14-day right of withdrawal. See our <Link href="/rueckgabe">returns page</Link> and <Link href="/widerrufsbelehrung">cancellation policy</Link>.</> },
-  { q: "Are prices inclusive of VAT?", text: "Yes, all prices include German VAT. Shipping costs are added at checkout.", a: <>Yes, all prices include German VAT. Shipping costs are added at checkout.</> },
 ];
 
-export default function FaqPage() {
+const vatFaq = (smallBusiness: boolean) => {
+  const text = smallBusiness
+    ? "All prices are final prices. As a small business under § 19 UStG we do not charge VAT. Shipping costs are added at checkout."
+    : "Yes, all prices include German VAT. Shipping costs are added at checkout.";
+  return { q: smallBusiness ? "Do prices include VAT?" : "Are prices inclusive of VAT?", text, a: <>{text}</> };
+};
+
+export const revalidate = 600;
+
+export default async function FaqPage() {
+  const settings = await getStoreSettings();
+  const faqs = [...baseFaqs, vatFaq(settings.smallBusiness)];
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

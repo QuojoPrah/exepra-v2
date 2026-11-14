@@ -62,7 +62,7 @@ export default async function AdminOrder({ params }: PageProps<"/admin/orders/[i
               {order.discountTotal > 0 && <div className="flex justify-between"><dt className="text-muted">Discount ({order.couponCode})</dt><dd>−{formatPrice(order.discountTotal)}</dd></div>}
               <div className="flex justify-between"><dt className="text-muted">Shipping · {order.shippingLabel}</dt><dd>{formatPrice(order.shippingTotal)}</dd></div>
               <div className="flex justify-between font-semibold"><dt>Total</dt><dd>{formatPrice(order.total)}</dd></div>
-              <div className="flex justify-between text-xs text-muted"><dt>VAT included</dt><dd>{formatPrice(order.taxTotal)}</dd></div>
+              <div className="flex justify-between text-xs text-muted"><dt>VAT included</dt><dd>{order.taxTotal > 0 ? formatPrice(order.taxTotal) : "none (§ 19 UStG)"}</dd></div>
             </dl>
           </Card>
 

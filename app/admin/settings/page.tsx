@@ -50,14 +50,15 @@ export default async function AdminSettings() {
           <Status ok={s.imageStorage} label="Image storage (Cloudinary)" detail="CLOUDINARY_CLOUD_NAME / API_KEY / API_SECRET — required for uploads in production." />
           <Status ok={s.analytics} label="Analytics (optional)" detail="NEXT_PUBLIC_PLAUSIBLE_DOMAIN — loads only after visitor consent." />
         </ul>
-        <p className="mt-3 text-xs text-muted">Secrets are configured as environment variables on your host (never in the database). Currency: EUR. Prices include VAT.</p>
+        <p className="mt-3 text-xs text-muted">Secrets are configured as environment variables on your host (never in the database). Currency: EUR. {settings.smallBusiness ? "Small-business rule: no VAT is charged." : "Prices include VAT."}</p>
       </Card>
 
       <Card title="Store information">
         <ActionForm action={saveStoreSettings}>
           <div className="grid gap-4 sm:grid-cols-2">
             <F label="Store name" name="storeName" defaultValue={settings.storeName} />
-            <F label="Default VAT rate (%)" name="defaultVatRate" type="number" defaultValue={settings.defaultVatRate} hint="Applied to shipping costs" />
+            <F label="Default VAT rate (%)" name="defaultVatRate" type="number" defaultValue={settings.defaultVatRate} hint="Applied to shipping costs (ignored under the small-business rule)" />
+            <div className="sm:col-span-2"><Check label="Small-business rule (Kleinunternehmer, § 19 UStG): do not charge or show VAT" name="smallBusiness" defaultChecked={settings.smallBusiness} /></div>
             <F label="Tagline (footer)" name="tagline" defaultValue={settings.tagline} className="sm:col-span-2" />
             <F label="Contact email (shown on contact page, receives form messages)" name="contactEmail" type="email" defaultValue={settings.contactEmail} />
             <F label="Contact phone" name="contactPhone" defaultValue={settings.contactPhone} />

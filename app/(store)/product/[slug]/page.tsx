@@ -9,7 +9,7 @@ import { PurchasePanel } from "@/components/product/purchase-panel";
 import { ReviewForm } from "@/components/product/review-form";
 import ProductGrid from "@/components/product/product-grid";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
-import { getShippingRules } from "@/lib/settings";
+import { getShippingRules, getStoreSettings } from "@/lib/settings";
 import { getSession } from "@/lib/session";
 import { hasPurchased } from "@/lib/reviews";
 import { db } from "@/lib/db";
@@ -38,10 +38,11 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
   const product = await getProductBySlug((await params).slug);
   if (!product) notFound();
 
-  const [related, shipping, session] = await Promise.all([
+  const [related, shipping, session, settings] = await Promise.all([
     getRelatedProducts(product.id, product.categoryId),
     getShippingRules(),
     getSession(),
+    getStoreSettings(),
   ]);
 
   let reviewEligibility: "signed-out" | "eligible" | "not-purchased" | "already-reviewed" = "signed-out";
@@ -119,7 +120,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
             />
           </div>
           <p className="mt-3 text-xs text-muted">
-            Incl. {product.vatRate}% VAT, plus{" "}
+            {settings.smallBusiness ? "Final price — no VAT is charged (§ 19 UStG), plus" : `Incl. ${product.vatRate}% VAT, plus`}{" "}
             <Link href="/versand" className="underline underline-offset-2">
               shipping
             </Link>

@@ -197,6 +197,9 @@ export async function buildCartView(cartId: string | null | undefined, opts: { c
     cart.couponCode ? db.coupon.findUnique({ where: { code: cart.couponCode } }) : null,
   ]);
 
+  // Small-business rule (§ 19 UStG): no VAT is charged, so none is calculated or stored.
+  if (settings.smallBusiness) lines.forEach((l) => (l.vatRate = 0));
+
   const totals = computeTotals({
     lines: purchasable.map((l) => ({ unitPrice: l.unitPrice, quantity: l.quantity, vatRate: l.vatRate })),
     coupon,
@@ -204,7 +207,7 @@ export async function buildCartView(cartId: string | null | undefined, opts: { c
     shippingRules: rules,
     country: opts.country ?? "DE",
     shippingCode: opts.shippingCode,
-    defaultVatRate: settings.defaultVatRate,
+    defaultVatRate: settings.smallBusiness ? 0 : settings.defaultVatRate,
   });
 
   return {
