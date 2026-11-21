@@ -6,14 +6,23 @@ extends SceneTree
 ## Exits with code 0 when every test passes, 1 otherwise.
 
 const SAVE_SCRIPT := preload("res://scripts/autoload/save_manager.gd")
-const ECON_SCRIPT := preload("res://scripts/autoload/economy_manager.gd")
 
 var _passed := 0
 var _failed := 0
 var _current := ""
 
 
-func _initialize() -> void:
+var _ran := false
+
+
+func _process(_delta: float) -> bool:
+	if not _ran:
+		_ran = true
+		_run_all()
+	return false
+
+
+func _run_all() -> void:
 	var tests := [
 		"test_valid_pour", "test_invalid_pour_color_mismatch", "test_pour_into_empty",
 		"test_pour_into_full", "test_partial_capacity", "test_multi_unit_pour",
@@ -262,7 +271,7 @@ func test_save_corrupt_file() -> void:
 
 
 func test_stars() -> void:
-	check(ECON_SCRIPT.stars_for(10, 10) == 3, "par = 3 stars")
-	check(ECON_SCRIPT.stars_for(16, 10) == 2, "a few over par = 2 stars")
-	check(ECON_SCRIPT.stars_for(40, 10) == 1, "far over par = 1 star")
-	check(ECON_SCRIPT.level_reward(3, true, 1) > ECON_SCRIPT.level_reward(3, false, 1), "first clear pays more")
+	check(Scoring.stars_for(10, 10) == 3, "par = 3 stars")
+	check(Scoring.stars_for(16, 10) == 2, "a few over par = 2 stars")
+	check(Scoring.stars_for(40, 10) == 1, "far over par = 1 star")
+	check(Scoring.level_reward(3, true, 1) > Scoring.level_reward(3, false, 1), "first clear pays more")

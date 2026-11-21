@@ -9,7 +9,7 @@ var _days: Array[PanelContainer] = []
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var m := UIKit.make_modal("Daily Reward", 640.0, true)
 	add_child(m["root"])
 	var body: VBoxContainer = m["body"]

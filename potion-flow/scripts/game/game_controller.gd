@@ -80,6 +80,12 @@ func _ready() -> void:
 	AudioManager.play_music()
 
 
+func _exit_tree() -> void:
+	if _hint_task >= 0:
+		WorkerThreadPool.wait_for_task_completion(_hint_task)
+		_hint_task = -1
+
+
 func _on_viewport_resized() -> void:
 	_layout(false)
 

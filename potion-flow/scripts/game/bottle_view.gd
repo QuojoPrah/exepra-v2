@@ -226,14 +226,14 @@ func _draw() -> void:
 		for k in range(glows.size() - 1, -1, -1):
 			var c := glow_color
 			c.a = glow_strength * (0.10 + 0.08 * (glows.size() - k))
-			draw_colored_polygon(glows[k], c)
+			_fill(glows[k], c)
 
 	var inner: PackedVector2Array = _shape["inner"]
 	var outer: PackedVector2Array = _shape["outer"]
 
 	# Glass body (back face).
-	draw_colored_polygon(outer, Color(tint.r, tint.g, tint.b, tint.a * 0.6))
-	draw_colored_polygon(inner, Color(0.04, 0.02, 0.10, 0.35))
+	_fill(outer, Color(tint.r, tint.g, tint.b, tint.a * 0.6))
+	_fill(inner, Color(0.04, 0.02, 0.10, 0.35))
 
 	_draw_liquid(inner)
 	_draw_bubbles()
@@ -261,14 +261,14 @@ func _draw_liquid(inner: PackedVector2Array) -> void:
 		var poly := _layer_polygon(y_top, y_bottom, li == last, wave_amp, -angle)
 		var base := PotionColors.get_color(layers[li]["color"])
 		for piece in Geometry2D.intersect_polygons(poly, inner):
-			draw_colored_polygon(piece, base)
+			_fill(piece, base)
 			for shade in Geometry2D.intersect_polygons(piece, shade_band):
-				draw_colored_polygon(shade, base.darkened(0.22))
+				_fill(shade, base.darkened(0.22))
 			# Glossy meniscus on the surface, thin seam between potions.
 			var band_h := 5.0 if li == last else 2.0
 			var band := _layer_polygon(y_top, y_top + band_h, li == last, wave_amp, -angle)
 			for m in Geometry2D.intersect_polygons(band, piece):
-				draw_colored_polygon(m, base.lightened(0.35 if li == last else 0.18))
+				_fill(m, base.lightened(0.35 if li == last else 0.18))
 		y_bottom = y_top
 
 
@@ -378,7 +378,7 @@ func _draw_glass_front(inner: PackedVector2Array, rim: Color) -> void:
 		Vector2(-hw + 15.0, shoulder + 6.0), Vector2(-hw + 9.0, shoulder + 12.0),
 	])
 	for piece in Geometry2D.intersect_polygons(refl, inner):
-		draw_colored_polygon(piece, Color(1, 1, 1, 0.30))
+		_fill(piece, Color(1, 1, 1, 0.30))
 	# Thin secondary reflection.
 	draw_line(Vector2(-hw + 21.0, -40.0), Vector2(-hw + 21.0, -90.0), Color(1, 1, 1, 0.12), 2.0, true)
 	# Shoulder sparkle.
@@ -418,3 +418,9 @@ func _draw_cork() -> void:
 		Color(0.4, 0.24, 0.12, a), 1.5)
 	# A little gold seal.
 	draw_circle(Vector2(0, top + 3.0), 4.0, Color(0.96, 0.78, 0.42, a))
+
+
+## draw_colored_polygon that skips degenerate clip slivers (they fail to triangulate).
+func _fill(poly: PackedVector2Array, color: Color) -> void:
+	if poly.size() >= 3 and _poly_area(poly) > 0.5:
+		draw_colored_polygon(poly, color)

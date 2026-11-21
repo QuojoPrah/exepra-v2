@@ -15,7 +15,7 @@ var _time := 0.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	theme_data = Cosmetics.get_theme(SaveManager.get_value("cosmetics", "theme", "purple"))
 	low_effects = SaveManager.get_value("settings", "low_effects", false)
 	SaveManager.changed.connect(_on_save_changed)

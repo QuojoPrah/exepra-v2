@@ -55,11 +55,11 @@ Legend: [x] done · [~] done with placeholder / partial · [ ] not started
 - [x] App icon (1024/512/192), Android adaptive icon layers, splash
 - [x] Android + iOS export presets
 - [~] Privacy policy / terms: **placeholder text**
-- [ ] Store screenshots, signing keys, real package id
+- [~] Store screenshots (draft captures in docs/screenshots) · [ ] signing keys, real package id
 - [ ] Monetisation (intentionally none; economy is balanced for free play)
 
 ## Verification status
 - [x] All GDScript parses and lints clean (gdtoolkit 4.5)
 - [x] Python reference tests: 167 passing (rules, solver vs brute force, all 150 levels)
-- [ ] GDScript unit + integration tests **written but not yet executed in Godot**
-      (the build environment could not run the Godot binary) — run them first
+- [x] Godot 4.3: unit tests 417/417, integration 22/22 (real taps through the Game scene)
+- [x] Rendered on the Vulkan Mobile renderer; screenshots in `docs/screenshots/`

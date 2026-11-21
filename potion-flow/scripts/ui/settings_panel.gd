@@ -11,7 +11,7 @@ var _modal: Dictionary
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_modal = UIKit.make_modal("Settings", 640.0, true)
 	add_child(_modal["root"])
 	var body: VBoxContainer = _modal["body"]

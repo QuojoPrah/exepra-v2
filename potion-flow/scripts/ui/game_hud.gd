@@ -27,7 +27,7 @@ var _bottom: Control
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	theme = UIKit.get_theme()
 	_build_top()
@@ -60,8 +60,6 @@ func _build_top() -> void:
 	_top = Control.new()
 	_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_top.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_top.custom_minimum_size = Vector2(0, 150)
-	_top.size = Vector2(720, 150)
 	add_child(_top)
 
 	var home := UIKit.make_icon_button("home", "", Color("#2C1F4A"), 84)

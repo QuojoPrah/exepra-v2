@@ -24,7 +24,7 @@ func setup(level: int, stars: int, reward: int, bonus: int, moves: int, par: int
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var m := UIKit.make_modal("Level %d Complete!" % _level, 620.0, false)
 	add_child(m["root"])
 	var body: VBoxContainer = m["body"]
@@ -99,7 +99,8 @@ func _ready() -> void:
 		if k < _stars:
 			tw.tween_callback(AudioManager.play.bind("select", 1.0 + 0.15 * k))
 	var total := _reward + _bonus
-	tw.tween_method(func(v: float) -> void: coin_label.text = "+%d" % int(v), 0.0, float(total), 0.6)
+	var count_up := func(v: float) -> void: coin_label.text = "+%d" % int(v)
+	tw.tween_method(count_up, 0.0, float(total), 0.6)
 	tw.tween_callback(AudioManager.play.bind("coin"))
 
 

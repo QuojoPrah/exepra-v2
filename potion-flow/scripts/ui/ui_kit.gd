@@ -149,7 +149,7 @@ static func make_icon_button(icon_id: String, caption: String, base: Color = VIO
 	var ic := IconView.new()
 	ic.icon = icon_id
 	ic.color = TEXT
-	ic.set_anchors_preset(Control.PRESET_FULL_RECT)
+	ic.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ic.offset_left = diameter * 0.22
 	ic.offset_right = -diameter * 0.22
 	ic.offset_top = diameter * 0.16
@@ -176,8 +176,9 @@ static func add_badge(parent: Control, text: String, color: Color = PINK) -> Lab
 	st.content_margin_top = 1
 	st.content_margin_bottom = 1
 	l.add_theme_stylebox_override("normal", st)
-	l.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	l.position = Vector2(parent.custom_minimum_size.x - 34, -8)
+	# Anchored top-left with a fixed offset: the parent's size is not final yet.
+	l.position = Vector2(parent.custom_minimum_size.x - 40, -10)
+	l.custom_minimum_size = Vector2(44, 32)
 	parent.add_child(l)
 	return l
 
@@ -233,15 +234,15 @@ static func coin_pill(amount: int) -> PanelContainer:
 ## Full-screen dimmer with a centred card. Returns {"root", "card", "body", "close"}.
 static func make_modal(title: String, width := 600.0, closable := true) -> Dictionary:
 	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.theme = get_theme()
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
 	var dim := ColorRect.new()
 	dim.color = Color(0.03, 0.01, 0.08, 0.72)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.add_child(dim)
 	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(center)
 	var card := PanelContainer.new()

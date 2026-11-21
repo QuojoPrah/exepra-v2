@@ -55,22 +55,13 @@ func add_hint_tokens(n: int) -> void:
 	hints_changed.emit(hint_tokens())
 
 
-## Coins for finishing a level. Replays pay a small amount.
+## Coins for finishing a level (see Scoring).
 static func level_reward(stars: int, first_time: bool, level: int) -> int:
-	if not first_time:
-		return 5
-	var base := 20 + mini(level, 200) / 10
-	return base + stars * 5
+	return Scoring.level_reward(stars, first_time, level)
 
 
 static func stars_for(moves: int, par: int) -> int:
-	if par <= 0:
-		return 3
-	if moves <= par:
-		return 3
-	if moves <= int(ceil(par * 1.5)) + 2:
-		return 2
-	return 1
+	return Scoring.stars_for(moves, par)
 
 
 func owns(kind: String, id: String) -> bool:

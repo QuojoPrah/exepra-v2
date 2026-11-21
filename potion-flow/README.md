@@ -7,6 +7,8 @@ Tap a bottle to lift it, tap another to pour. The top run of a colour pours
 across, up to the space available, and only onto the same colour or into an
 empty bottle. Fill every bottle with a single potion to brew the level.
 
+![Potion Flow](docs/screenshots/02_game.jpg)
+
 ## Run it
 
 1. Install Godot **4.3 or newer** (standard build, not .NET).
@@ -23,6 +25,9 @@ godot --headless --path potion-flow -s res://tests/run_tests.gd
 # End-to-end: plays levels through the real Game scene with taps, undo,
 # restart, hints, extra bottles, completion rewards and save/resume
 godot --headless --path potion-flow res://tests/IntegrationTest.tscn
+
+# Screenshots of every screen (needs a display / xvfb-run)
+godot --path potion-flow res://tests/Screenshots.tscn -- /tmp/shots
 
 # Reference rules + every shipped level proven solvable (no Godot needed)
 cd potion-flow/tools && python3 -m pytest test_level_tool.py -q

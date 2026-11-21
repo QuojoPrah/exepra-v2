@@ -43,6 +43,12 @@ func _store_prefetched(n: int, data: LevelData) -> void:
 		_cache[n] = data
 
 
+func _exit_tree() -> void:
+	for n in _prefetching:
+		WorkerThreadPool.wait_for_task_completion(_prefetching[n])
+	_prefetching.clear()
+
+
 func has_file(n: int) -> bool:
 	return FileAccess.file_exists(LevelData.FILE_PATTERN % n)
 

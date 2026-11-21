@@ -15,7 +15,7 @@ var _coin_label: Label
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_tab = initial_tab
 	var m := UIKit.make_modal("Collection" if collection_mode else "Shop", 660.0, true)
 	add_child(m["root"])

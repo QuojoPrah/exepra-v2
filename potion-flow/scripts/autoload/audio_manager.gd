@@ -178,8 +178,17 @@ func _build_music_threaded() -> void:
 	call_deferred("_on_music_ready", stream)
 
 
+func _exit_tree() -> void:
+	# Never quit while the synthesis thread is still running.
+	if _music_task >= 0:
+		WorkerThreadPool.wait_for_task_completion(_music_task)
+		_music_task = -1
+
+
 func _on_music_ready(stream: AudioStream) -> void:
-	WorkerThreadPool.wait_for_task_completion(_music_task)
+	if _music_task >= 0:
+		WorkerThreadPool.wait_for_task_completion(_music_task)
+		_music_task = -1
 	_music.stream = stream
 	_music.play()
 
