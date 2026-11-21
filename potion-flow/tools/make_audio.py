@@ -389,14 +389,224 @@ def ambient_music():
     return normalize(loop, -3)
 
 
+# ---------------------------------------------------------------- groove (main theme)
+BPM = 92
+BEAT = 60.0 / BPM
+SWING = 0.60  # 0.5 = straight; >0.5 delays every off-beat 8th (head-nod shuffle)
+
+
+def swing_time(bar, eighth):
+    """Time of the n-th swung 8th note (0..7) in a bar."""
+    beat, off = divmod(eighth, 2)
+    return (bar * 4 + beat + (SWING if off else 0.0)) * BEAT
+
+
+def sixteenth_time(bar, six):
+    beat, sub = divmod(six, 4)
+    swing16 = [0.0, 0.27, 0.5, 0.77]  # light 16th swing
+    return (bar * 4 + beat + swing16[sub]) * BEAT
+
+
+def kick(amp=1.0):
+    t = t_axis(0.45)
+    f = 48 + 110 * np.exp(-t / 0.035)
+    body = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.16)
+    click = highpass(noise(0.01), 1500) * np.linspace(1, 0, int(0.01 * SR)) * 0.3
+    body[: len(click)] += click
+    return amp * np.tanh(body * 1.6) / np.tanh(1.6)
+
+
+def snare(amp=1.0):
+    t = t_axis(0.35)
+    tone = np.sin(2 * np.pi * 185 * t) * np.exp(-t / 0.05) * 0.6
+    tone += np.sin(2 * np.pi * 330 * t) * np.exp(-t / 0.03) * 0.3
+    sn = bandpass(noise(0.35), 1200, 5500) * np.exp(-t / 0.08)
+    return amp * (tone + sn * 0.9)
+
+
+def rim(amp=1.0):
+    t = t_axis(0.08)
+    return amp * bandpass(np.sin(2 * np.pi * 1700 * t) + noise(0.08) * 0.4, 900, 4000) * np.exp(-t / 0.018)
+
+
+def hat(amp=1.0, open_=False):
+    dur = 0.32 if open_ else 0.06
+    t = t_axis(dur)
+    return amp * highpass(noise(dur), 7000) * np.exp(-t / (0.12 if open_ else 0.018))
+
+
+def shaker(amp=1.0):
+    t = t_axis(0.09)
+    return amp * bandpass(noise(0.09), 5000, 11000) * np.sin(np.pi * t / 0.09) ** 2
+
+
+def epiano(freq, dur, amp=1.0):
+    """Rhodes-like FM tine: modulator index decays, gentle tremolo."""
+    t = t_axis(dur + 0.6)
+    idx = 1.6 * np.exp(-t / 0.25) + 0.15
+    mod = np.sin(2 * np.pi * freq * t) * idx
+    tone = np.sin(2 * np.pi * freq * t + mod)
+    tone += 0.25 * np.sin(2 * np.pi * freq * 2 * t + mod * 0.5) * np.exp(-t / 0.4)
+    env = np.clip(t / 0.004, 0, 1) * np.exp(-t / 1.4)
+    env *= np.clip((dur + 0.6 - t) / 0.6, 0, 1) * np.where(t < dur, 1.0, np.exp(-(t - dur) / 0.12))
+    trem = 1 + 0.12 * np.sin(2 * np.pi * 4.8 * t)
+    return amp * tone * env * trem
+
+
+def bass_note(freq, dur, amp=1.0):
+    t = t_axis(dur + 0.08)
+    tone = np.sin(2 * np.pi * freq * t) + 0.35 * np.sin(4 * np.pi * freq * t) * np.exp(-t / 0.15)
+    env = np.clip(t / 0.006, 0, 1) * np.exp(-t / 0.9) * np.clip((dur + 0.08 - t) / 0.08, 0, 1)
+    return amp * np.tanh(1.8 * tone * env) / np.tanh(1.8)
+
+
+def groove_music():
+    """32-bar head-nod loop (~83 s): swung boom-bap drums, bouncy bass,
+    e-piano stabs and a music-box hook, in B minor / D major."""
+    bars = 32
+    total = bars * 4 * BEAT
+    n = int(total * SR)
+    pad_ext = 4 * SR
+    drums = np.zeros(n + pad_ext)
+    bass = np.zeros(n + pad_ext)
+    keys = np.zeros(n + pad_ext)
+    lead = np.zeros(n + pad_ext)
+    r = np.random.default_rng(11)
+
+    # Progression (2 bars each): Bm9 – Em9 – A13 – Dmaj9  | ... | Gmaj7 – F#7sus/F#7
+    prog_a = [("B", [59, 62, 66, 69, 73], 47), ("E", [55, 59, 62, 66, 67], 40),
+              ("A", [55, 61, 64, 66, 71], 45), ("D", [57, 61, 64, 66, 69], 50)]
+    prog_b = [("G", [55, 59, 62, 66, 69], 43), ("F#", [58, 61, 64, 66, 68], 42),
+              ("B", [59, 62, 66, 69, 73], 47), ("D", [57, 61, 64, 66, 69], 50)]
+    sections = ["A", "A", "B", "A"]  # 8 bars each
+    chord_at = []
+    for sec in sections:
+        prog = prog_a if sec == "A" else prog_b
+        for name, voicing, root in prog:
+            chord_at += [(voicing, root), (voicing, root)]
+
+    for bar in range(bars):
+        voicing, root = chord_at[bar]
+        intro = bar < 2           # drums ease in
+        breakdown = bar in (22, 23)  # short drop for contrast
+        fill = bar % 8 == 7
+        # ---- drums: boom-bap. Kick on 1, the "a" of 2, and the "and" of 3.
+        if not breakdown:
+            if not intro or bar == 1:
+                place(drums, kick(1.0), swing_time(bar, 0))
+                place(drums, kick(0.7), sixteenth_time(bar, 7))
+                place(drums, kick(0.85), swing_time(bar, 5))
+                if bar % 2 == 1:
+                    place(drums, kick(0.6), sixteenth_time(bar, 14))
+            if not intro:
+                place(drums, snare(0.55), swing_time(bar, 2))
+                place(drums, snare(0.6), swing_time(bar, 6))
+                place(drums, rim(0.25), sixteenth_time(bar, 11))  # ghost
+            for e in range(8):
+                accent = 0.32 if e % 2 == 0 else 0.2
+                place(drums, hat(accent * r.uniform(0.85, 1.1)), swing_time(bar, e))
+            if bar % 4 == 3:
+                place(drums, hat(0.22, open_=True), swing_time(bar, 7))
+            if fill and not intro:
+                for k, six in enumerate([12, 13, 14, 15]):
+                    place(drums, snare(0.25 + 0.08 * k), sixteenth_time(bar, six))
+        else:
+            for e in range(0, 8, 2):
+                place(drums, shaker(0.25), swing_time(bar, e) + 0.5 * BEAT)
+        # ---- bass: root on 1, octave pop, approach to the next chord.
+        if not intro or bar == 1:
+            next_root = chord_at[(bar + 1) % bars][1]
+            f_root = midi(root)
+            if not breakdown:
+                place(bass, bass_note(f_root, BEAT * 1.4, 0.9), swing_time(bar, 0))
+                place(bass, bass_note(f_root * 2, BEAT * 0.4, 0.55), swing_time(bar, 3))
+                place(bass, bass_note(f_root * 1.5, BEAT * 0.8, 0.7), swing_time(bar, 5))
+                if bar % 2 == 1:
+                    place(bass, bass_note(midi(next_root - 1 if next_root > root else next_root + 2), BEAT * 0.45, 0.6),
+                          swing_time(bar, 7))
+            else:
+                place(bass, bass_note(f_root, BEAT * 3.5, 0.6), swing_time(bar, 0))
+        # ---- keys: stab on 1 and on the "and" of 2 (classic lo-fi push).
+        if bar % 2 == 0 or breakdown:
+            for note in voicing:
+                place(keys, epiano(midi(note), BEAT * 1.3, 0.3), swing_time(bar, 0) + r.uniform(0, 0.012))
+        for note in voicing[1:]:
+            place(keys, epiano(midi(note), BEAT * 0.6, 0.22), swing_time(bar, 3) + r.uniform(0, 0.01))
+
+    # ---- hook: a repeating music-box motif (call in bar 1, answer in bar 2).
+    call = [(0, 78), (1, 81), (2, 83), (3, 81), (5, 78), (6, 76)]          # F# A B A . F# E
+    answer = [(0, 74), (1, 76), (2, 78), (4, 81), (5, 78), (7, 74)]       # D E F# . A F# . D
+    answer_b = [(0, 79), (1, 78), (2, 76), (3, 74), (4, 73), (6, 74)]     # G F# E D C# . D
+    for bar in range(4, bars, 2):
+        if bar in (22,):
+            continue
+        sec = sections[bar // 8]
+        phrase_b = answer_b if sec == "B" else answer
+        for e, note in call:
+            place(lead, bell(midi(note), 1.2, 0.26, 0.55), swing_time(bar, e))
+        for e, note in phrase_b:
+            place(lead, bell(midi(note), 1.2, 0.24, 0.55), swing_time(bar + 1, e))
+
+    # Wrap tails into the loop start so the loop point is seamless.
+    for buf in (drums, bass, keys, lead):
+        buf[:pad_ext] += buf[n:]
+    drums, bass, keys, lead = drums[:n], bass[:n], keys[:n], lead[:n]
+
+    # Side-chain pump: keys duck under every kick for the bounce.
+    t = np.arange(n) / SR
+    duck = np.ones(n)
+    for bar in range(bars):
+        for at in (swing_time(bar, 0), swing_time(bar, 5)):
+            i = int(at * SR)
+            k = np.arange(min(int(0.35 * SR), n - i)) / SR
+            duck[i:i + len(k)] = np.minimum(duck[i:i + len(k)], 1 - 0.45 * np.exp(-k / 0.12))
+    keys = lowpass(keys * duck, 4500)
+    bass = lowpass(bass, 900)
+
+    # Stereo mix with reverb on keys and lead, a little room on drums.
+    def stereo(x, pan):
+        return np.stack([x * (1 - pan), x * pan], axis=1) * 1.4
+
+    def wrapped_verb(x, wet, secs, decay, seed):
+        y = add_reverb(x, wet, secs, decay, 5000, seed)
+        out = y[:n].copy()
+        out[: len(y) - n] += y[n:]
+        return out
+
+    mix = stereo(drums, 0.5) * 0.9
+    mix += wrapped_verb(stereo(drums, 0.5) * 0.25, 0.5, 0.6, 0.4, 3)
+    mix += stereo(bass, 0.5) * 0.75
+    mix += wrapped_verb(stereo(keys, 0.42), 0.3, 2.5, 2.0, 4)
+    lead_st = np.stack([lead, np.roll(lead, int(0.012 * SR))], axis=1) * 0.75
+    mix += wrapped_verb(lead_st, 0.35, 3.0, 2.4, 6)
+    # Subtle vinyl warmth.
+    crackle = np.zeros(n)
+    pops = r.integers(0, n, 600)
+    crackle[pops] = r.uniform(-0.04, 0.04, 600)
+    crackle = bandpass(crackle, 1500, 7000) + lowpass(r.standard_normal(n), 3000) * 0.0025
+    mix += np.stack([crackle, crackle], axis=1)
+    mix = highpass(mix, 30)
+    mix = np.tanh(mix * 1.3) / np.tanh(1.3)  # gentle glue
+    f = int(0.004 * SR)
+    mix[:f] = mix[:f] * np.linspace(0, 1, f)[:, None] + mix[-f:] * np.linspace(1, 0, f)[:, None]
+    mix = mix[:-f]
+    # Sits under the sound effects: about -18 dB RMS.
+    return normalize(mix, -8.0)
+
+
 def main():
     for name, (fn, peak) in SFX.items():
         x = normalize(trim_tail(fn()), peak)
         write_ogg(x, SFX_DIR / f"{name}.ogg")
         print(f"sfx  {name:15s} {len(x) / SR:5.2f}s")
-    music = ambient_music()
-    write_ogg(music, MUSIC_DIR / "ambient.ogg", quality=4)
-    print(f"music ambient          {len(music) / SR:5.1f}s")
+    # The groove is the main theme (played as "ambient"); the calm pad is kept
+    # as an alternative track.
+    music = groove_music()
+    write_ogg(music, MUSIC_DIR / "ambient.ogg", quality=5)
+    print(f"music groove (main)    {len(music) / SR:5.1f}s")
+    calm = ambient_music()
+    write_ogg(calm, MUSIC_DIR / "calm.ogg", quality=4)
+    print(f"music calm             {len(calm) / SR:5.1f}s")
 
 
 if __name__ == "__main__":

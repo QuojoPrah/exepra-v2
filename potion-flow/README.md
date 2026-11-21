@@ -85,7 +85,8 @@ potion-flow/
 * **Saves.** `user://potion_flow_save.json` is versioned and written atomically,
   with a `migrate()` hook. It is grouped into sections (`progress`, `economy`,
   `cosmetics`, `settings`, `daily`) so it can sync to a cloud save as-is.
-* **Audio.** Original sound effects and a 68 s seamless ambient loop, rendered
+* **Audio.** Original sound effects and an 83 s head-nod groove (92 BPM swung
+  boom-bap, bass, e-piano, music-box hook), plus a calm alternative (`calm.ogg`), rendered
   by `tools/make_audio.py`. The liquid uses a bubble-resonance physical model,
   the glass uses modal synthesis, and everything runs through a stereo
   convolution reverb. No samples are used, so there are no third-party licences.

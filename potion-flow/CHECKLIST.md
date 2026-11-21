@@ -43,7 +43,7 @@ Legend: [x] done · [~] done with placeholder / partial · [ ] not started
 - [ ] Server-time validation / cloud save (structure ready)
 
 ## Phase 7 — Polish
-- [x] Sound: 12 original SFX + 68 s seamless ambient loop (tools/make_audio.py, licence-free)
+- [x] Sound: 12 original SFX + 83 s groove theme (92 BPM) + calm alt track (tools/make_audio.py, licence-free)
 - [x] Music / SFX volume + mute, vibration toggle (haptics on mobile)
 - [x] Button squash/overshoot, modal pop-in, fades between screens, toasts
 - [x] Reduced-effects mode (stops idle redraws, fewer particles)
