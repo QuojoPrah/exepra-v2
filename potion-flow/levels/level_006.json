@@ -1,0 +1,71 @@
+{
+ "level": 6,
+ "tier": "tutorial",
+ "difficulty": 0.03,
+ "colors": [
+  "red",
+  "blue",
+  "green"
+ ],
+ "bottle_capacity": 4,
+ "empty_bottles": 2,
+ "par_moves": 8,
+ "bottles": [
+  [
+   "blue",
+   "red",
+   "blue"
+  ],
+  [],
+  [
+   "green",
+   "green",
+   "green",
+   "red"
+  ],
+  [
+   "green",
+   "blue",
+   "red"
+  ],
+  [
+   "blue",
+   "red"
+  ]
+ ],
+ "mechanics": {},
+ "solution": [
+  [
+   2,
+   3
+  ],
+  [
+   3,
+   4
+  ],
+  [
+   0,
+   3
+  ],
+  [
+   0,
+   1
+  ],
+  [
+   4,
+   1
+  ],
+  [
+   0,
+   3
+  ],
+  [
+   3,
+   4
+  ],
+  [
+   2,
+   3
+  ]
+ ]
+}

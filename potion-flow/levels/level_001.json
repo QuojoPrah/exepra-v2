@@ -1,0 +1,43 @@
+{
+ "level": 1,
+ "tier": "tutorial",
+ "difficulty": 0.0,
+ "colors": [
+  "red",
+  "blue"
+ ],
+ "bottle_capacity": 4,
+ "empty_bottles": 1,
+ "par_moves": 3,
+ "bottles": [
+  [
+   "red",
+   "red",
+   "red",
+   "blue"
+  ],
+  [
+   "blue",
+   "blue",
+   "blue",
+   "red"
+  ],
+  []
+ ],
+ "mechanics": {},
+ "tutorial": "Pour the top layer into the empty bottle.",
+ "solution": [
+  [
+   0,
+   2
+  ],
+  [
+   1,
+   0
+  ],
+  [
+   1,
+   2
+  ]
+ ]
+}

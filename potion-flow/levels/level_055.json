@@ -1,0 +1,120 @@
+{
+ "level": 55,
+ "tier": "medium",
+ "difficulty": 0.275,
+ "colors": [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "violet"
+ ],
+ "bottle_capacity": 4,
+ "empty_bottles": 2,
+ "par_moves": 16,
+ "bottles": [
+  [
+   "violet",
+   "blue",
+   "yellow",
+   "yellow"
+  ],
+  [
+   "violet",
+   "red",
+   "yellow",
+   "green"
+  ],
+  [
+   "blue",
+   "red",
+   "blue",
+   "green"
+  ],
+  [
+   "red",
+   "blue",
+   "yellow",
+   "green"
+  ],
+  [
+   "violet",
+   "green",
+   "violet",
+   "red"
+  ],
+  [],
+  []
+ ],
+ "mechanics": {},
+ "solution": [
+  [
+   0,
+   5
+  ],
+  [
+   1,
+   6
+  ],
+  [
+   1,
+   5
+  ],
+  [
+   2,
+   6
+  ],
+  [
+   0,
+   2
+  ],
+  [
+   3,
+   6
+  ],
+  [
+   3,
+   5
+  ],
+  [
+   2,
+   3
+  ],
+  [
+   1,
+   2
+  ],
+  [
+   0,
+   1
+  ],
+  [
+   4,
+   2
+  ],
+  [
+   4,
+   1
+  ],
+  [
+   4,
+   6
+  ],
+  [
+   1,
+   4
+  ],
+  [
+   2,
+   0
+  ],
+  [
+   3,
+   2
+  ],
+  [
+   0,
+   3
+  ]
+ ]
+}

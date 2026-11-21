@@ -1,0 +1,71 @@
+{
+ "level": 14,
+ "tier": "easy",
+ "difficulty": 0.07,
+ "colors": [
+  "red",
+  "blue",
+  "green"
+ ],
+ "bottle_capacity": 4,
+ "empty_bottles": 2,
+ "par_moves": 8,
+ "bottles": [
+  [
+   "red",
+   "red",
+   "blue",
+   "green"
+  ],
+  [
+   "blue",
+   "green"
+  ],
+  [
+   "blue",
+   "green"
+  ],
+  [
+   "red",
+   "red",
+   "blue",
+   "green"
+  ],
+  []
+ ],
+ "mechanics": {},
+ "solution": [
+  [
+   0,
+   1
+  ],
+  [
+   1,
+   2
+  ],
+  [
+   0,
+   1
+  ],
+  [
+   2,
+   4
+  ],
+  [
+   3,
+   4
+  ],
+  [
+   1,
+   2
+  ],
+  [
+   3,
+   2
+  ],
+  [
+   0,
+   3
+  ]
+ ]
+}

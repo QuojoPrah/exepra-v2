@@ -1,0 +1,60 @@
+{
+ "level": 2,
+ "tier": "tutorial",
+ "difficulty": 0.0,
+ "colors": [
+  "red",
+  "blue"
+ ],
+ "bottle_capacity": 4,
+ "empty_bottles": 2,
+ "par_moves": 7,
+ "bottles": [
+  [
+   "red",
+   "blue",
+   "red",
+   "blue"
+  ],
+  [
+   "blue",
+   "red",
+   "blue",
+   "red"
+  ],
+  [],
+  []
+ ],
+ "mechanics": {},
+ "tutorial": "Use both empty bottles to separate the layers.",
+ "solution": [
+  [
+   0,
+   2
+  ],
+  [
+   1,
+   0
+  ],
+  [
+   1,
+   2
+  ],
+  [
+   0,
+   1
+  ],
+  [
+   0,
+   2
+  ],
+  [
+   1,
+   0
+  ],
+  [
+   1,
+   2
+  ]
+ ]
+}
