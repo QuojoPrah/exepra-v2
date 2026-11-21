@@ -1,10 +1,10 @@
 extends Node
 ## Sound effects, ambient music and haptics (autoload "AudioManager").
 ##
-## Every sound is a TEMPORARY procedural placeholder synthesised at startup.
-## To replace one, drop a file named after its id into res://assets/audio/sfx/
-## (e.g. pour.ogg or pour.wav) or res://assets/audio/music/ambient.ogg; files
-## found there always win over the synthesised version.
+## Sounds load from res://assets/audio/sfx/<id>.ogg and the music from
+## res://assets/audio/music/ambient.ogg (rendered by tools/make_audio.py).
+## To swap a sound, replace its file (ogg, wav or mp3). If a file is missing,
+## a simple synthesised fallback is generated so the game is never silent.
 
 const SFX_DIR := "res://assets/audio/sfx/"
 const MUSIC_PATH := "res://assets/audio/music/ambient"
@@ -175,6 +175,10 @@ func _build_music_threaded() -> void:
 	var stream: AudioStream = _load_override(MUSIC_PATH)
 	if stream == null:
 		stream = _synth_ambient()
+	elif stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = true
+	elif stream is AudioStreamMP3:
+		(stream as AudioStreamMP3).loop = true
 	call_deferred("_on_music_ready", stream)
 
 
@@ -183,6 +187,12 @@ func _exit_tree() -> void:
 	if _music_task >= 0:
 		WorkerThreadPool.wait_for_task_completion(_music_task)
 		_music_task = -1
+	for p in _pool:
+		p.stop()
+		p.stream = null
+	_music.stop()
+	_music.stream = null
+	_sfx.clear()
 
 
 func _on_music_ready(stream: AudioStream) -> void:

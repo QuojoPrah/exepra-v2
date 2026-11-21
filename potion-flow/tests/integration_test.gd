@@ -57,7 +57,19 @@ func _tap_move(from: int, to: int) -> void:
 	await _wait_idle()
 
 
+func _check_audio() -> void:
+	for id in ["select", "pour", "land", "complete", "level_complete", "coin", "error", "hint"]:
+		check(AudioManager._sfx.get(id) is AudioStreamOggVorbis, "sound '%s' loaded from assets" % id)
+	var t := 0.0
+	while AudioManager._music.stream == null and t < 10.0:
+		await get_tree().process_frame
+		t += get_process_delta_time()
+	var music: AudioStream = AudioManager._music.stream
+	check(music is AudioStreamOggVorbis and (music as AudioStreamOggVorbis).loop, "looping ambient music loaded")
+
+
 func _run() -> void:
+	await _check_audio()
 	# --- Level 1: tap-select, invalid move, undo, restart, solve -------------
 	await _start(1)
 	var start: Array = game.board.to_array()

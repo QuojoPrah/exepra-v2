@@ -85,10 +85,13 @@ potion-flow/
 * **Saves.** `user://potion_flow_save.json` is versioned and written atomically,
   with a `migrate()` hook. It is grouped into sections (`progress`, `economy`,
   `cosmetics`, `settings`, `daily`) so it can sync to a cloud save as-is.
-* **Audio.** Every sound is a procedurally synthesised **placeholder**. Drop
-  `res://assets/audio/sfx/<id>.ogg` (ids: select, deselect, move, pour, land,
-  complete, click, level_complete, coin, error, hint, unlock) or
-  `res://assets/audio/music/ambient.ogg` and it replaces the placeholder automatically.
+* **Audio.** Original sound effects and a 68 s seamless ambient loop, rendered
+  by `tools/make_audio.py`. The liquid uses a bubble-resonance physical model,
+  the glass uses modal synthesis, and everything runs through a stereo
+  convolution reverb. No samples are used, so there are no third-party licences.
+  To replace a sound, overwrite `assets/audio/sfx/<id>.ogg` (ids: select, deselect,
+  move, pour, land, complete, click, level_complete, coin, error, hint, unlock)
+  or `assets/audio/music/ambient.ogg`. Missing files fall back to a simple synthesiser.
 
 ## Adding a special mechanic
 
@@ -104,7 +107,6 @@ Nothing else needs to change.
 ## Before publishing
 
 * Replace the placeholder legal copy in `scripts/ui/legal_text.gd`.
-* Replace the placeholder sounds (see above).
 * Set your own `package/unique_name` / `bundle_identifier` (currently
   `com.potionflow.game`) and your signing keys in `export_presets.cfg`.
 * Android export needs the Godot export templates and a debug/release keystore.
