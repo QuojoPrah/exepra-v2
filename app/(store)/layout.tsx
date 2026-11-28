@@ -6,6 +6,8 @@ import { CartDrawer } from "@/components/cart/cart-drawer";
 import { QuickView } from "@/components/product/quick-view";
 import { CookieConsent } from "@/components/layout/cookie-consent";
 import { Toaster } from "@/components/layout/toaster";
+import { SmoothScroll } from "@/components/motion/smooth-scroll";
+import { ScrollProgress } from "@/components/motion/interactive";
 import { getActiveCollections, getNavCategories } from "@/lib/catalog";
 import { getStoreSettings } from "@/lib/settings";
 
@@ -14,6 +16,8 @@ export default async function StoreLayout({ children }: { children: React.ReactN
 
   return (
     <StoreProviders>
+      <SmoothScroll />
+      <ScrollProgress />
       {settings.announcementActive && <AnnouncementBar messages={settings.announcements} />}
       <Navbar categories={categories} collections={collections.map((c) => ({ slug: c.slug, name: c.name }))} />
       <main id="main" className="flex-1">

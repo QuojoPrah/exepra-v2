@@ -28,7 +28,24 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+  }
+  /* Native smooth anchor scrolling only where Lenis isn't running (touch, reduced motion). */
+  html:not(.lenis) {
     scroll-behavior: smooth;
+  }
+  /* Lenis smooth-scroll base rules (from lenis/dist/lenis.css, which the package doesn't export). */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+  }
+  .lenis [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
   }
   body {
     background: var(--color-ivory);

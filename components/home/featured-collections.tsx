@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { buttonClasses } from "@/components/ui/button";
+import { RevealText } from "@/components/motion/reveal";
 import { Price } from "@/components/ui/price";
 import type { ProductSummary } from "@/lib/catalog";
 import { FALLBACK_IMAGE } from "@/lib/site";
@@ -28,9 +29,7 @@ export default function FeaturedCollections({ collections }: { collections: Coll
         <div className="mb-10 flex items-end justify-between gap-6">
           <div>
             <p className="eyebrow mb-3">Featured collection</p>
-            <h2 id="collection-heading" className="text-3xl font-semibold sm:text-4xl">
-              Curated edits
-            </h2>
+            <RevealText as="h2" id="collection-heading" text="Curated edits" className="text-3xl font-semibold sm:text-4xl" />
           </div>
           {collections.length > 1 && (
             <div className="flex gap-2">
@@ -58,7 +57,14 @@ export default function FeaturedCollections({ collections }: { collections: Coll
             aria-label={`${index + 1} of ${collections.length}: ${c.name}`}
           >
             <Link href={`/collections/${c.slug}`} className="group relative block aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] bg-sand lg:aspect-auto lg:min-h-[520px]">
-              <Image src={c.image ?? FALLBACK_IMAGE} alt="" fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover transition duration-[1200ms] group-hover:scale-[1.03]" />
+              <motion.div
+                className="absolute inset-0"
+                initial={{ clipPath: direction > 0 ? "inset(0% 0% 0% 100%)" : "inset(0% 100% 0% 0%)", scale: 1.15 }}
+                animate={{ clipPath: "inset(0% 0% 0% 0%)", scale: 1 }}
+                transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
+              >
+                <Image src={c.image ?? FALLBACK_IMAGE} alt="" fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover transition duration-[1200ms] group-hover:scale-[1.03]" />
+              </motion.div>
             </Link>
             <div className="flex flex-col justify-center">
               <h3 className="text-3xl font-semibold sm:text-4xl">{c.name}</h3>

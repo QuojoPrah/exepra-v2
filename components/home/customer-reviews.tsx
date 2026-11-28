@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BadgeCheck } from "lucide-react";
 import { Stars } from "@/components/ui/stars";
+import { Stagger } from "@/components/motion/reveal";
 
 type Review = {
   id: string;
@@ -24,9 +25,9 @@ export default function CustomerReviews({ reviews }: { reviews: Review[] }) {
             In their words
           </h2>
         </div>
-        <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <Stagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3" itemClassName="flex">
           {reviews.map((r) => (
-            <li key={r.id} className="flex flex-col rounded-[var(--radius-card)] border border-line bg-white p-7">
+            <div key={r.id} className="flex w-full flex-col rounded-[var(--radius-card)] border border-line bg-white p-7">
               <Stars rating={r.rating} />
               {r.title && <p className="mt-5 font-display text-lg font-medium leading-snug">{r.title}</p>}
               <blockquote className="mt-3 flex-1 text-[0.95rem] leading-relaxed text-ink-soft">“{r.body}”</blockquote>
@@ -43,9 +44,9 @@ export default function CustomerReviews({ reviews }: { reviews: Review[] }) {
                   on {r.product.name}
                 </Link>
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </Stagger>
       </div>
     </section>
   );

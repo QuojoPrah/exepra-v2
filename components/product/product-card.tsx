@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Eye, Heart, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 import { Price } from "@/components/ui/price";
+import { Tilt } from "@/components/motion/interactive";
 import { Stars } from "@/components/ui/stars";
 import { useCart, useUI, useWishlist } from "@/components/providers/store-providers";
 import type { ProductSummary } from "@/lib/catalog";
@@ -31,6 +32,7 @@ export default function ProductCard({ product, priority = false }: { product: Pr
 
   return (
     <article className="group relative flex flex-col">
+      <Tilt className="rounded-[var(--radius-card)]">
       <div className="relative aspect-[4/5] overflow-hidden rounded-[var(--radius-card)] bg-cream">
         <Link href={href} tabIndex={-1} aria-hidden className="absolute inset-0">
           <Image
@@ -89,6 +91,7 @@ export default function ProductCard({ product, priority = false }: { product: Pr
           </button>
         </div>
       </div>
+      </Tilt>
 
       <div className="mt-3.5 flex flex-1 flex-col px-0.5">
         {product.category && <p className="text-[11px] uppercase tracking-[0.14em] text-muted">{product.category}</p>}

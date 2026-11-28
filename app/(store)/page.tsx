@@ -1,4 +1,5 @@
 import Hero, { type HeroSlideData } from "@/components/home/hero";
+import { Marquee } from "@/components/motion/marquee";
 import FeaturedCategories from "@/components/home/featured-categories";
 import BestSellers from "@/components/home/best-sellers";
 import ExepraDifference from "@/components/home/exepra-difference";
@@ -35,6 +36,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero slides={slides.length ? slides : DEFAULT_SLIDES} />
+      <Marquee items={["Thoughtfully curated", "Everyday elegance", "For women & little ones", "The new season edit"]} />
       <FeaturedCategories
         categories={[
           ...categories.slice(0, 3),

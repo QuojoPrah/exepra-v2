@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { RevealText } from "@/components/motion/reveal";
+import { Magnetic } from "@/components/motion/interactive";
 import { buttonClasses } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -41,8 +43,17 @@ export default function Hero({ slides }: { slides: HeroSlideData[] }) {
 
   const slide = slides[index];
 
+  // Scroll-linked depth: the image sinks and zooms, the text drifts up and fades.
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
+  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, -90]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
+
   return (
     <section
+      ref={sectionRef}
       className="relative isolate flex min-h-[640px] items-end overflow-hidden bg-ink text-white h-[92svh] max-h-[960px]"
       aria-roledescription="carousel"
       aria-label="Featured"
@@ -51,10 +62,11 @@ export default function Hero({ slides }: { slides: HeroSlideData[] }) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
+      <motion.div className="absolute inset-0 -z-10 will-change-transform" style={reduceMotion ? undefined : { y: imageY, scale: imageScale }}>
       <AnimatePresence initial={false}>
         <motion.div
           key={slide.id + index}
-          className="absolute inset-0 -z-10"
+          className="absolute inset-0"
           initial={{ opacity: 0, scale: 1.06 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
@@ -73,11 +85,13 @@ export default function Hero({ slides }: { slides: HeroSlideData[] }) {
           )}
         </motion.div>
       </AnimatePresence>
+      </motion.div>
       {/* Readability overlays */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/70 via-black/25 to-black/20" aria-hidden />
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/45 via-black/10 to-transparent" aria-hidden />
 
       <div className="container-page relative pb-24 pt-40 sm:pb-28 lg:pb-32">
+        <motion.div style={reduceMotion ? undefined : { y: contentY, opacity: contentOpacity }}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={slide.id + index}
@@ -90,23 +104,36 @@ export default function Hero({ slides }: { slides: HeroSlideData[] }) {
             aria-roledescription="slide"
             aria-label={`${index + 1} of ${count}`}
           >
-            {slide.eyebrow && <p className="mb-5 text-xs font-semibold uppercase tracking-[0.32em] text-white/80">{slide.eyebrow}</p>}
-            <h1 className="text-[2.6rem] font-semibold leading-[1.04] tracking-[-0.03em] [text-wrap:balance] sm:text-6xl lg:text-7xl">{slide.title}</h1>
-            {slide.subtitle && <p className="mt-5 max-w-lg text-base leading-relaxed text-white/85 sm:text-lg">{slide.subtitle}</p>}
-            <div className="mt-9 flex flex-wrap gap-3">
+            {slide.eyebrow && (
+              <motion.p initial={{ opacity: 0, letterSpacing: "0.5em" }} animate={{ opacity: 1, letterSpacing: "0.32em" }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="mb-5 text-xs font-semibold uppercase tracking-[0.32em] text-white/80">
+                {slide.eyebrow}
+              </motion.p>
+            )}
+            <RevealText as="h1" text={slide.title} onView={false} delay={0.1} stagger={0.08} className="text-[2.6rem] font-semibold leading-[1.04] tracking-[-0.03em] [text-wrap:balance] sm:text-6xl lg:text-7xl" />
+            {slide.subtitle && (
+              <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mt-5 max-w-lg text-base leading-relaxed text-white/85 sm:text-lg">
+                {slide.subtitle}
+              </motion.p>
+            )}
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.6, ease: [0.22, 1, 0.36, 1] }} className="mt-9 flex flex-wrap gap-3">
               {slide.primaryHref && slide.primaryLabel && (
-                <Link href={slide.primaryHref} className={buttonClasses("light", "lg", "h-13")}>
-                  {slide.primaryLabel}
-                </Link>
+                <Magnetic>
+                  <Link href={slide.primaryHref} className={buttonClasses("light", "lg", "h-13")}>
+                    {slide.primaryLabel}
+                  </Link>
+                </Magnetic>
               )}
               {slide.secondaryHref && slide.secondaryLabel && (
-                <Link href={slide.secondaryHref} className={cn(buttonClasses("ghost", "lg", "h-13"), "border border-white/60 text-white hover:bg-white/10")}>
-                  {slide.secondaryLabel}
-                </Link>
+                <Magnetic>
+                  <Link href={slide.secondaryHref} className={cn(buttonClasses("ghost", "lg", "h-13"), "border border-white/60 text-white hover:bg-white/10")}>
+                    {slide.secondaryLabel}
+                  </Link>
+                </Magnetic>
               )}
-            </div>
+            </motion.div>
           </motion.div>
         </AnimatePresence>
+        </motion.div>
 
         {count > 1 && (
           <div className="absolute bottom-8 left-4 right-4 flex items-center justify-between gap-4 sm:left-6 sm:right-6 lg:left-10 lg:right-10">
